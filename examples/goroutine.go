@@ -22,7 +22,7 @@ func sqliteEngine() (*xorm.Engine, error) {
 }
 
 func mysqlEngine() (*xorm.Engine, error) {
-	return xorm.NewEngine("mysql", "root:***REMOVED***@/test?charset=utf8")
+	return xorm.NewEngine("mysql", "root:@/test?charset=utf8")
 }
 
 var u *User = &User{}
