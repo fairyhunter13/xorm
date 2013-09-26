@@ -64,3 +64,7 @@ func (db ****REMOVED***) SupportEngine() bool {
 func (db ****REMOVED***) SupportCharset() bool {
 	return false
 }
+
+func (db ****REMOVED***) IndexOnTable() bool {
+	return false
+}
