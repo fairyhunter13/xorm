@@ -10,7 +10,7 @@ CREATE DATABASE IF NOT EXISTS ***REMOVED*** CHARACTER SET
 utf8 COLLATE utf8_general_ci;
 */
 
-var showTestSql bool = false
+var showTestSql bool = true
 
 func TestMyMysql(t *testing.T) {
 	engine, err := NewEngine("mymysql", "***REMOVED***2/root/")
