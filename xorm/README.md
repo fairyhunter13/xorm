@@ -30,7 +30,17 @@ to get help
 
 example:
 
+sqlite:
 `xorm reverse sqite3 test.db templates/goxorm`
+
+mysql:
+`xorm reverse mysql root:@/***REMOVED***?charset=utf8 templates/goxorm`
+
+mymysql:
+`xorm reverse mymysql ***REMOVED***2/root/ templates/goxorm`
+
+***REMOVED***:
+`xorm reverse ***REMOVED*** "dbname=***REMOVED*** sslmode=disable" templates/goxorm`
 
 will generated go files in `./model` directory
 
