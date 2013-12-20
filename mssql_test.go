@@ -12,8 +12,6 @@ utf8 COLLATE utf8_general_ci;
 */
 
 func newMssqlEngine() (*Engine, error) {
-	//return NewEngine("adodb", "Provider=SQLOLEDB; Server=127.0.0.1;Database=***REMOVED***; uid=sa; pwd=***REMOVED***4;")
-
 	return NewEngine("odbc", "driver={SQL Server};Server=127.0.0.1;Database=***REMOVED***; uid=sa; pwd=***REMOVED***4;")
 }
 
