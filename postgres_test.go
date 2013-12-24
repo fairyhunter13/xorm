@@ -8,11 +8,11 @@ import (
 )
 
 func newPostgresEngine() (*Engine, error) {
-	return NewEngine("***REMOVED***", "dbname=***REMOVED*** sslmode=disable")
+	return NewEngine("***REMOVED***", "dbname=***REMOVED*** user=lunny password=***REMOVED***4 sslmode=disable")
 }
 
 func newPostgresDriverDB() (*sql.DB, error) {
-	return sql.Open("***REMOVED***", "dbname=***REMOVED*** sslmode=disable")
+	return sql.Open("***REMOVED***", "dbname=***REMOVED*** user=lunny password=***REMOVED***4 sslmode=disable")
 }
 
 func TestPostgres(t *testing.T) {
