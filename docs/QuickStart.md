@@ -45,7 +45,7 @@ xorm 快速入门
 ```Go
 import (
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/lunny/xorm"
+	"github.com/go-xorm/xorm"
 )
 engine, err := xorm.NewEngine("mysql", "root:***REMOVED***@/test?charset=utf8")
 defer engine.Close()
@@ -56,7 +56,7 @@ or
 ```Go
 import (
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/lunny/xorm"
+	"github.com/go-xorm/xorm"
 	)
 engine, err = xorm.NewEngine("sqlite3", "./test.db")
 defer engine.Close()
@@ -169,7 +169,7 @@ type User struct {
 }
 ```
 
-对于不同的数据库系统，数据类型其实是有些差异的。因此xorm中对数据类型有自己的定义，基本的原则是尽量兼容各种数据库的字段类型，具体的字段对应关系可以查看[字段类型对应表](https://github.com/lunny/xorm/blob/master/docs/COLUMNTYPE.md)。对于使用者，一般只要使用自己熟悉的数据库字段定义即可。
+对于不同的数据库系统，数据类型其实是有些差异的。因此xorm中对数据类型有自己的定义，基本的原则是尽量兼容各种数据库的字段类型，具体的字段对应关系可以查看[字段类型对应表](https://github.com/go-xorm/xorm/blob/master/docs/COLUMNTYPE.md)。对于使用者，一般只要使用自己熟悉的数据库字段定义即可。
 
 具体的映射规则如下，另Tag中的关键字均不区分大小写，字段名区分大小写：
 
@@ -181,7 +181,7 @@ type User struct {
         <td>pk</td><td>是否是Primary Key，如果在一个struct中有多个字段都使用了此标记，则这多个字段构成了复合主键，单主键当前支持int32,int,int64,uint32,uint,uint64,string这7种Go的数据类型，复合主键支持这7种Go的数据类型的组合。</td>
     </tr>
     <tr>
-        <td>当前支持30多种字段类型，详情参见 [字段类型](https://github.com/lunny/xorm/blob/master/docs/COLUMNTYPE.md)</td><td>字段类型</td>
+        <td>当前支持30多种字段类型，详情参见 [字段类型](https://github.com/go-xorm/xorm/blob/master/docs/COLUMNTYPE.md)</td><td>字段类型</td>
     </tr>
     <tr>
         <td>autoincr</td><td>是否是自增</td>
@@ -227,7 +227,7 @@ type User struct {
 
 - 2.string类型默认映射为varchar(255)，如果需要不同的定义，可以在tag中自定义
 
-- 3.支持`type MyString string`等自定义的field，支持Slice, Map等field成员，这些成员默认存储为Text类型，并且默认将使用Json格式来序列化和反序列化。也支持数据库字段类型为Blob类型，如果是Blob类型，则先使用Json格式序列化再转成[]byte格式。当然[]byte或者[]uint8默认为Blob类型并且都以二进制方式存储。具体参见 [go类型<->数据库类型对应表](https://github.com/lunny/xorm/blob/master/docs/AutoMap.md)
+- 3.支持`type MyString string`等自定义的field，支持Slice, Map等field成员，这些成员默认存储为Text类型，并且默认将使用Json格式来序列化和反序列化。也支持数据库字段类型为Blob类型，如果是Blob类型，则先使用Json格式序列化再转成[]byte格式。当然[]byte或者[]uint8默认为Blob类型并且都以二进制方式存储。具体参见 [go类型<->数据库类型对应表](https://github.com/go-xorm/xorm/blob/master/docs/AutoMap.md)
 
 - 4.实现了Conversion接口的类型或者结构体，将根据接口的转换方式在类型和数据库记录之间进行相互转换。
 ```Go
@@ -242,7 +242,7 @@ type Conversion interface {
 
 如果不使用tag来定义field对应的数据库字段类型，那么系统会自动给出一个默认的字段类型，对应表如下：
 
-[go类型<->数据库类型对应表](https://github.com/lunny/xorm/blob/master/docs/AutoMap.md)
+[go类型<->数据库类型对应表](https://github.com/go-xorm/xorm/blob/master/docs/AutoMap.md)
 
 <a name="30" id="30"></a>
 ## 3.表结构操作
@@ -755,7 +755,7 @@ engine.ClearCache(new(User))
 
 缓存的实现原理如下图所示：
 
-![cache design](https://raw.github.com/lunny/xorm/master/docs/cache_design.png)
+![cache design](https://raw.github.com/go-xorm/xorm/master/docs/cache_design.png)
 
 <a name="125" id="125"></a>
 ## 12.事件
@@ -788,12 +788,12 @@ xorm支持两种方式的事件，一种是在Struct中的特定方法来作为�
 xorm工具提供了xorm命令，能够帮助做很多事情。
 
 ### 13.1.反转命令
-参见 [xorm工具](https://github.com/lunny/xorm/tree/master/xorm)
+参见 [xorm工具](https://github.com/go-xorm/xorm/tree/master/xorm)
 
 <a name="140" id="140"></a>
 ## 14.Examples
 
-请访问[https://github.com/lunny/xorm/tree/master/examples](https://github.com/lunny/xorm/tree/master/examples)
+请访问[https://github.com/go-xorm/xorm/tree/master/examples](https://github.com/go-xorm/xorm/tree/master/examples)
 
 <a name="150" id="150"></a>
 ## 15.案例
