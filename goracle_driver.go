@@ -1,4 +1,4 @@
-package drivers
+package xorm
 
 import (
 	"errors"
@@ -7,9 +7,9 @@ import (
 	"github.com/go-xorm/core"
 )
 
-func init() {
-	core.RegisterDriver("g***REMOVED***", &g***REMOVED***Driver{})
-}
+// func init() {
+// 	core.RegisterDriver("g***REMOVED***", &g***REMOVED***Driver{})
+// }
 
 type g***REMOVED***Driver struct {
 }
