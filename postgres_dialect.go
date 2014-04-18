@@ -17,8 +17,8 @@ type ***REMOVED*** struct {
 	core.Base
 }
 
-func (db ****REMOVED***) Init(uri *core.Uri, drivername, dataSourceName string) error {
-	return db.Base.Init(db, uri, drivername, dataSourceName)
+func (db ****REMOVED***) Init(d *core.DB, uri *core.Uri, drivername, dataSourceName string) error {
+	return db.Base.Init(d, db, uri, drivername, dataSourceName)
 }
 
 func (db ****REMOVED***) SqlType(c *core.Column) string {
@@ -112,15 +112,13 @@ func (db ****REMOVED***) GetColumns(tableName string) ([]string, map[string]*cor
 	args := []interface{}{tableName}
 	s := "SELECT column_name, column_default, is_nullable, data_type, character_maximum_length" +
 		", numeric_precision, numeric_precision_radix FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = $1"
-	cnn, err := core.Open(db.DriverName(), db.DataSourceName())
+
+	rows, err := db.DB().Query(s, args...)
 	if err != nil {
 		return nil, nil, err
 	}
-	defer cnn.Close()
-	rows, err := cnn.Query(s, args...)
-	if err != nil {
-		return nil, nil, err
-	}
+	defer rows.Close()
+
 	cols := make(map[string]*core.Column)
 	colSeq := make([]string, 0)
 
@@ -200,15 +198,12 @@ func (db ****REMOVED***) GetColumns(tableName string) ([]string, map[string]*cor
 func (db ****REMOVED***) GetTables() ([]*core.Table, error) {
 	args := []interface{}{}
 	s := "SELECT tablename FROM pg_tables where schemaname = 'public'"
-	cnn, err := core.Open(db.DriverName(), db.DataSourceName())
+
+	rows, err := db.DB().Query(s, args...)
 	if err != nil {
 		return nil, err
 	}
-	defer cnn.Close()
-	rows, err := cnn.Query(s, args...)
-	if err != nil {
-		return nil, err
-	}
+	defer rows.Close()
 
 	tables := make([]*core.Table, 0)
 	for rows.Next() {
@@ -228,15 +223,11 @@ func (db ****REMOVED***) GetIndexes(tableName string) (map[string]*core.Index, e
 	args := []interface{}{tableName}
 	s := "SELECT indexname, indexdef FROM pg_indexes WHERE schemaname = 'public' and tablename = $1"
 
-	cnn, err := core.Open(db.DriverName(), db.DataSourceName())
+	rows, err := db.DB().Query(s, args...)
 	if err != nil {
 		return nil, err
 	}
-	defer cnn.Close()
-	rows, err := cnn.Query(s, args...)
-	if err != nil {
-		return nil, err
-	}
+	defer rows.Close()
 
 	indexes := make(map[string]*core.Index, 0)
 	for rows.Next() {
