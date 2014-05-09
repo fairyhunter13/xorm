@@ -123,7 +123,7 @@ func (db ****REMOVED***) IsColumnExist(tableName string, col *core.Column) (bool
 	if rows.Next() {
 		return true, nil
 	}
-	return false, core.ErrNotExist
+	return false, nil
 }
 
 func (db ****REMOVED***) GetColumns(tableName string) ([]string, map[string]*core.Column, error) {
