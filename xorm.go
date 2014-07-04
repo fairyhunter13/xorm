@@ -1,7 +1,6 @@
 package xorm
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"os"
@@ -17,42 +16,29 @@ const (
 	Version string = "0.4"
 )
 
-// !nashtsai! implicit register drivers and dialects is no good, as init() can be called before sql driver got registered
-// func init() {
-// 	regDrvsNDialects()
-// }
-
 func regDrvsNDialects() bool {
-	if core.RegisteredDriverSize() == 0 {
-		providedDrvsNDialects := map[string]struct {
-			dbType     core.DbType
-			getDriver  func() core.Driver
-			getDialect func() core.Dialect
-		}{
-			"mssql":    {"mssql", func() core.Driver { return &odbcDriver{} }, func() core.Dialect { return &mssql{} }},
-			"odbc":     {"mssql", func() core.Driver { return &odbcDriver{} }, func() core.Dialect { return &mssql{} }}, // !nashtsai! TODO change this when supporting MS Access
-			"mysql":    {"mysql", func() core.Driver { return &mysqlDriver{} }, func() core.Dialect { return &mysql{} }},
-			"mymysql":  {"mysql", func() core.Driver { return &mymysqlDriver{} }, func() core.Dialect { return &mysql{} }},
-			"***REMOVED***": {"***REMOVED***", func() core.Driver { return &pqDriver{} }, func() core.Dialect { return &***REMOVED***{} }},
-			"sqlite3":  {"sqlite3", func() core.Driver { return &sqlite3Driver{} }, func() core.Dialect { return &sqlite3{} }},
-			"oci8":     {"***REMOVED***", func() core.Driver { return &oci8Driver{} }, func() core.Dialect { return &***REMOVED***{} }},
-			"g***REMOVED***":  {"***REMOVED***", func() core.Driver { return &g***REMOVED***Driver{} }, func() core.Dialect { return &***REMOVED***{} }},
-		}
-
-		for driverName, v := range providedDrvsNDialects {
-			_, err := sql.Open(driverName, "")
-			if err == nil {
-				// fmt.Printf("driver succeed: %v\n", driverName)
-				core.RegisterDriver(driverName, v.getDriver())
-				core.RegisterDialect(v.dbType, v.getDialect())
-			} else {
-				// fmt.Printf("driver failed: %v | err: %v\n", driverName, err)
-			}
-		}
-		return true
-	} else {
-		return false
+	providedDrvsNDialects := map[string]struct {
+		dbType     core.DbType
+		getDriver  func() core.Driver
+		getDialect func() core.Dialect
+	}{
+		"mssql":    {"mssql", func() core.Driver { return &odbcDriver{} }, func() core.Dialect { return &mssql{} }},
+		"odbc":     {"mssql", func() core.Driver { return &odbcDriver{} }, func() core.Dialect { return &mssql{} }}, // !nashtsai! TODO change this when supporting MS Access
+		"mysql":    {"mysql", func() core.Driver { return &mysqlDriver{} }, func() core.Dialect { return &mysql{} }},
+		"mymysql":  {"mysql", func() core.Driver { return &mymysqlDriver{} }, func() core.Dialect { return &mysql{} }},
+		"***REMOVED***": {"***REMOVED***", func() core.Driver { return &pqDriver{} }, func() core.Dialect { return &***REMOVED***{} }},
+		"sqlite3":  {"sqlite3", func() core.Driver { return &sqlite3Driver{} }, func() core.Dialect { return &sqlite3{} }},
+		"oci8":     {"***REMOVED***", func() core.Driver { return &oci8Driver{} }, func() core.Dialect { return &***REMOVED***{} }},
+		"g***REMOVED***":  {"***REMOVED***", func() core.Driver { return &g***REMOVED***Driver{} }, func() core.Dialect { return &***REMOVED***{} }},
 	}
+
+	for driverName, v := range providedDrvsNDialects {
+		if driver := core.QueryDriver(driverName); driver == nil {
+			core.RegisterDriver(driverName, v.getDriver())
+			core.RegisterDialect(v.dbType, v.getDialect())
+		}
+	}
+	return true
 }
 
 func close(engine *Engine) {
