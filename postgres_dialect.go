@@ -12,6 +12,9 @@ import (
 // func init() {
 // 	RegisterDialect("***REMOVED***", &***REMOVED***{})
 // }
+var (
+	***REMOVED***ReservedWords = map[string]bool{}
+)
 
 type ***REMOVED*** struct {
 	core.Base
@@ -71,6 +74,15 @@ func (db ****REMOVED***) SqlType(c *core.Column) string {
 
 func (db ****REMOVED***) SupportInsertMany() bool {
 	return true
+}
+
+func (db ****REMOVED***) IsReserved(name string) bool {
+	_, ok := ***REMOVED***ReservedWords[name]
+	return ok
+}
+
+func (db ****REMOVED***) Quote(name string) string {
+	return "\"" + name + "\""
 }
 
 func (db ****REMOVED***) QuoteStr() string {
