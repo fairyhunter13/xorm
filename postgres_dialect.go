@@ -896,8 +896,8 @@ func (db ****REMOVED***) DropIndexSql(tableName string, index *core.Index) strin
 	return fmt.Sprintf("DROP INDEX %v", quote(idxName))
 }
 
-func (db ****REMOVED***) IsColumnExist(tableName string, col *core.Column) (bool, error) {
-	args := []interface{}{tableName, col.Name}
+func (db ****REMOVED***) IsColumnExist(tableName, colName string) (bool, error) {
+	args := []interface{}{tableName, colName}
 	query := "SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = $1" +
 		" AND column_name = $2"
 	rows, err := db.DB().Query(query, args...)
