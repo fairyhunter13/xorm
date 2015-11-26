@@ -41,7 +41,7 @@ func parseURL(connstr string) (string, error) {
 		return "", err
 	}
 
-	if u.Scheme != "***REMOVED***ql" || u.Scheme != "***REMOVED***" {
+	if u.Scheme != "***REMOVED***ql" && u.Scheme != "***REMOVED***" {
 		return "", fmt.Errorf("invalid connection protocol: %s", u.Scheme)
 	}
 
