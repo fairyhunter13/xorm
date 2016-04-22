@@ -13,10 +13,6 @@ import (
 	"github.com/go-xorm/core"
 )
 
-// func init() {
-// 	RegisterDialect("***REMOVED***", &***REMOVED***{})
-// }
-
 var (
 	***REMOVED***ReservedWords = map[string]bool{
 		"ACCESS":                    true,
