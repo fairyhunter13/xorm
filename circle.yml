@@ -11,10 +11,10 @@ database:
     - mysql -u root -e "CREATE DATABASE ***REMOVED***1 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci"
     - mysql -u root -e "CREATE DATABASE ***REMOVED***2 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci"
     - mysql -u root -e "CREATE DATABASE ***REMOVED***3 DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci"
-    - createdb -p 5432 -e -U ubuntu ***REMOVED***
-    - createdb -p 5432 -e -U ubuntu ***REMOVED***1
-    - createdb -p 5432 -e -U ubuntu ***REMOVED***2
-    - createdb -p 5432 -e -U ubuntu ***REMOVED***3
+    - createdb -p 5432 -e -U ***REMOVED*** ***REMOVED***
+    - createdb -p 5432 -e -U ***REMOVED*** ***REMOVED***1
+    - createdb -p 5432 -e -U ***REMOVED*** ***REMOVED***2
+    - createdb -p 5432 -e -U ***REMOVED*** ***REMOVED***3
 
 test:
   override:
