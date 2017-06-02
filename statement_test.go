@@ -26,7 +26,7 @@ var colStrTests = []struct {
 }
 
 func TestColumnsStringGeneration(t *testing.T) {
-	if dbType == "***REMOVED***" {
+	if dbType == "***REMOVED***" || dbType == "mssql" {
 		return
 	}
 
