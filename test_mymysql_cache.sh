@@ -1,0 +1,1 @@
+go test -db=mymysql -conn_str="***REMOVED***/root/" -cache=true

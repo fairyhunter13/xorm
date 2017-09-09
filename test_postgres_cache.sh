@@ -1,0 +1,1 @@
+go test -db=***REMOVED*** -conn_str="dbname=***REMOVED*** sslmode=disable" -cache=true
