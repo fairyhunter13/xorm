@@ -769,6 +769,8 @@ var (
 	DefaultPostgresSchema = "public"
 )
 
+const ***REMOVED***PublicSchema = "public"
+
 type ***REMOVED*** struct {
 	core.Base
 }
