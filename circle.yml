@@ -17,6 +17,7 @@ database:
     - createdb -p 5432 -e -U ***REMOVED*** ***REMOVED***1
     - createdb -p 5432 -e -U ***REMOVED*** ***REMOVED***2
     - createdb -p 5432 -e -U ***REMOVED*** ***REMOVED***3
+    - psql ***REMOVED*** ***REMOVED*** -c "create schema xorm"
 
 test:
   override:
@@ -30,7 +31,9 @@ test:
     - go test -v -race -db="mymysql" -conn_str="***REMOVED***/root/" -cache=true -coverprofile=coverage3-2.txt -covermode=atomic
     - go test -v -race -db="***REMOVED***" -conn_str="dbname=***REMOVED*** sslmode=disable" -coverprofile=coverage4-1.txt -covermode=atomic
     - go test -v -race -db="***REMOVED***" -conn_str="dbname=***REMOVED*** sslmode=disable" -cache=true -coverprofile=coverage4-2.txt -covermode=atomic
-    - gocovmerge coverage1-1.txt coverage1-2.txt coverage2-1.txt coverage2-2.txt coverage3-1.txt coverage3-2.txt coverage4-1.txt coverage4-2.txt > coverage.txt
+    - go test -v -race -db="***REMOVED***" -conn_str="dbname=***REMOVED*** sslmode=disable" -schema=xorm -coverprofile=coverage5-1.txt -covermode=atomic
+    - go test -v -race -db="***REMOVED***" -conn_str="dbname=***REMOVED*** sslmode=disable" -schema=xorm -cache=true -coverprofile=coverage5-2.txt -covermode=atomic
+    - gocovmerge coverage1-1.txt coverage1-2.txt coverage2-1.txt coverage2-2.txt coverage3-1.txt coverage3-2.txt coverage4-1.txt coverage4-2.txt coverage5-1.txt coverage5-2.txt > coverage.txt
     - cd /home/ubuntu/.go_workspace/src/github.com/go-xorm/tests && ./sqlite3.sh
     - cd /home/ubuntu/.go_workspace/src/github.com/go-xorm/tests && ./mysql.sh
     - cd /home/ubuntu/.go_workspace/src/github.com/go-xorm/tests && ./***REMOVED***.sh
