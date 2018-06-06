@@ -31,7 +31,7 @@ func regDrvsNDialects() bool {
 		"mysql":    {"mysql", func() core.Driver { return &mysqlDriver{} }, func() core.Dialect { return &mysql{} }},
 		"mymysql":  {"mysql", func() core.Driver { return &mymysqlDriver{} }, func() core.Dialect { return &mysql{} }},
 		"***REMOVED***": {"***REMOVED***", func() core.Driver { return &pqDriver{} }, func() core.Dialect { return &***REMOVED***{} }},
-		"pgx":      {"***REMOVED***", func() core.Driver { return &pqDriver{} }, func() core.Dialect { return &***REMOVED***{} }},
+		"pgx":      {"***REMOVED***", func() core.Driver { return &pqDriverPgx{} }, func() core.Dialect { return &***REMOVED***{} }},
 		"sqlite3":  {"sqlite3", func() core.Driver { return &sqlite3Driver{} }, func() core.Dialect { return &sqlite3{} }},
 		"oci8":     {"***REMOVED***", func() core.Driver { return &oci8Driver{} }, func() core.Dialect { return &***REMOVED***{} }},
 		"g***REMOVED***":  {"***REMOVED***", func() core.Driver { return &g***REMOVED***Driver{} }, func() core.Dialect { return &***REMOVED***{} }},
