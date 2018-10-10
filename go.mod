@@ -3,6 +3,7 @@ module xorm.io/xorm
 go 1.11
 
 require (
+	gitea.com/xorm/xorm-redis-cache v0.0.0-20190927143017-f2a95401d847 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20190707035753-2be1aa521ff4
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/kr/pretty v0.1.0 // indirect

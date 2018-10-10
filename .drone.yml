@@ -203,3 +203,12 @@ services:
     - push
     - tag
     - pull_request
+
+- name: redis
+  pull: default
+  image: redis:3.0
+  when:
+    event:
+    - push
+    - tag
+    - pull_request
