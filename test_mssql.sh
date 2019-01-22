@@ -1,1 +1,1 @@
-go test -db=mssql -conn_str="server=192.168.1.58;user id=sa;password=***REMOVED***;database=***REMOVED***"
+go test -db=mssql -conn_str="server=localhost;user id=sa;password=***REMOVED***;database=***REMOVED***"
