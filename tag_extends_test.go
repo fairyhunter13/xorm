@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"xorm.io/core"
 	"github.com/stretchr/testify/assert"
+	"xorm.io/core"
 )
 
 type tempUser struct {
@@ -284,11 +284,12 @@ func TestExtends2(t *testing.T) {
 		assert.NoError(t, err)
 	}
 
-	var mapper = testEngine.GetTableMapper().Obj2Table
 	var quote = testEngine.Quote
-	userTableName := quote(testEngine.TableName(mapper("MessageUser"), true))
-	typeTableName := quote(testEngine.TableName(mapper("MessageType"), true))
-	msgTableName := quote(testEngine.TableName(mapper("Message"), true))
+	userTableName := quote(testEngine.TableName(tableMapper.Obj2Table("MessageUser"), true))
+	typeTableName := quote(testEngine.TableName(tableMapper.Obj2Table("MessageType"), true))
+	msgTableName := quote(testEngine.TableName(tableMapper.Obj2Table("Message"), true))
+
+	mapper := colMapper.Obj2Table
 
 	list := make([]Message, 0)
 	err = session.Table(msgTableName).Join("LEFT", []string{userTableName, "sender"}, "`sender`.`"+mapper("Id")+"`="+msgTableName+".`"+mapper("Uid")+"`").
@@ -353,11 +354,12 @@ func TestExtends3(t *testing.T) {
 		assert.NoError(t, err)
 	}
 
-	var mapper = testEngine.GetTableMapper().Obj2Table
 	var quote = testEngine.Quote
-	userTableName := quote(testEngine.TableName(mapper("MessageUser"), true))
-	typeTableName := quote(testEngine.TableName(mapper("MessageType"), true))
-	msgTableName := quote(testEngine.TableName(mapper("Message"), true))
+	userTableName := quote(testEngine.TableName(tableMapper.Obj2Table("MessageUser"), true))
+	typeTableName := quote(testEngine.TableName(tableMapper.Obj2Table("MessageType"), true))
+	msgTableName := quote(testEngine.TableName(tableMapper.Obj2Table("Message"), true))
+
+	var mapper = colMapper.Obj2Table
 
 	list := make([]MessageExtend3, 0)
 	err = session.Table(msgTableName).Join("LEFT", []string{userTableName, "sender"}, "`sender`.`"+mapper("Id")+"`="+msgTableName+".`"+mapper("Uid")+"`").
@@ -447,11 +449,12 @@ func TestExtends4(t *testing.T) {
 		assert.NoError(t, err)
 	}
 
-	var mapper = testEngine.GetTableMapper().Obj2Table
 	var quote = testEngine.Quote
-	userTableName := quote(testEngine.TableName(mapper("MessageUser"), true))
-	typeTableName := quote(testEngine.TableName(mapper("MessageType"), true))
-	msgTableName := quote(testEngine.TableName(mapper("Message"), true))
+	userTableName := quote(testEngine.TableName(tableMapper.Obj2Table("MessageUser"), true))
+	typeTableName := quote(testEngine.TableName(tableMapper.Obj2Table("MessageType"), true))
+	msgTableName := quote(testEngine.TableName(tableMapper.Obj2Table("Message"), true))
+
+	var mapper = colMapper.Obj2Table
 
 	list := make([]MessageExtend4, 0)
 	err = session.Table(msgTableName).Join("LEFT", userTableName, userTableName+".`"+mapper("Id")+"`="+msgTableName+".`"+mapper("Uid")+"`").
@@ -547,10 +550,9 @@ func TestExtends5(t *testing.T) {
 	session := testEngine.NewSession()
 	defer session.Close()
 
-	var mapper = testEngine.GetTableMapper().Obj2Table
 	var quote = testEngine.Quote
-	bookTableName := quote(testEngine.TableName(mapper("Book"), true))
-	sizeTableName := quote(testEngine.TableName(mapper("Size"), true))
+	bookTableName := quote(testEngine.TableName(tableMapper.Obj2Table("Book"), true))
+	sizeTableName := quote(testEngine.TableName(tableMapper.Obj2Table("Size"), true))
 
 	list := make([]Book, 0)
 	err = session.

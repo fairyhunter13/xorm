@@ -116,12 +116,16 @@ func createEngine(dbType, connStr string) error {
 		if len(*mapType) > 0 {
 			switch *mapType {
 			case "snake":
-				testEngine.SetMapper(core.SnakeMapper{})
+				tableMapper = core.SnakeMapper{}
 			case "same":
-				testEngine.SetMapper(core.SameMapper{})
+				tableMapper = core.SameMapper{}
 			case "gonic":
-				testEngine.SetMapper(core.LintGonicMapper)
+				tableMapper = core.LintGonicMapper
 			}
+
+			colMapper = tableMapper
+			testEngine.SetTableMapper(tableMapper)
+			testEngine.SetColumnMapper(colMapper)
 		}
 	}
 
