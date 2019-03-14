@@ -267,13 +267,17 @@ func TestOrder(t *testing.T) {
 	assert.NoError(t, prepareEngine())
 	assertSync(t, new(Userinfo))
 
+	idName := colMapper.Obj2Table("Id")
+	userName := colMapper.Obj2Table("Username")
+	heightName := colMapper.Obj2Table("Height")
+
 	users := make([]Userinfo, 0)
-	err := testEngine.OrderBy("id desc").Find(&users)
+	err := testEngine.OrderBy(idName + " desc").Find(&users)
 	assert.NoError(t, err)
 	fmt.Println(users)
 
 	users2 := make([]Userinfo, 0)
-	err = testEngine.Asc("id", "username").Desc("height").Find(&users2)
+	err = testEngine.Asc(idName, userName).Desc(heightName).Find(&users2)
 	assert.NoError(t, err)
 	fmt.Println(users2)
 }
@@ -282,8 +286,11 @@ func TestGroupBy(t *testing.T) {
 	assert.NoError(t, prepareEngine())
 	assertSync(t, new(Userinfo))
 
+	idName := colMapper.Obj2Table("Id")
+	userName := colMapper.Obj2Table("Username")
+
 	users := make([]Userinfo, 0)
-	err := testEngine.GroupBy("id, username").Find(&users)
+	err := testEngine.GroupBy(idName + ", " + userName).Find(&users)
 	assert.NoError(t, err)
 }
 
@@ -291,8 +298,10 @@ func TestHaving(t *testing.T) {
 	assert.NoError(t, prepareEngine())
 	assertSync(t, new(Userinfo))
 
+	userName := colMapper.Obj2Table("Username")
+
 	users := make([]Userinfo, 0)
-	err := testEngine.GroupBy("username").Having("username='xlw'").Find(&users)
+	err := testEngine.GroupBy(userName).Having(userName + "='xlw'").Find(&users)
 	assert.NoError(t, err)
 	fmt.Println(users)
 
@@ -310,29 +319,31 @@ func TestFindInts(t *testing.T) {
 	assertSync(t, new(Userinfo))
 
 	userinfo := testEngine.GetTableMapper().Obj2Table("Userinfo")
+	idName := colMapper.Obj2Table("Id")
+
 	var idsInt64 []int64
-	err := testEngine.Table(userinfo).Cols("id").Desc("id").Find(&idsInt64)
+	err := testEngine.Table(userinfo).Cols(idName).Desc(idName).Find(&idsInt64)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(idsInt64)
 
 	var idsInt32 []int32
-	err = testEngine.Table(userinfo).Cols("id").Desc("id").Find(&idsInt32)
+	err = testEngine.Table(userinfo).Cols(idName).Desc(idName).Find(&idsInt32)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(idsInt32)
 
 	var idsInt []int
-	err = testEngine.Table(userinfo).Cols("id").Desc("id").Find(&idsInt)
+	err = testEngine.Table(userinfo).Cols(idName).Desc(idName).Find(&idsInt)
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(idsInt)
 
 	var idsUint []uint
-	err = testEngine.Table(userinfo).Cols("id").Desc("id").Find(&idsUint)
+	err = testEngine.Table(userinfo).Cols(idName).Desc(idName).Find(&idsUint)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -340,7 +351,7 @@ func TestFindInts(t *testing.T) {
 
 	type MyInt int
 	var idsMyInt []MyInt
-	err = testEngine.Table(userinfo).Cols("id").Desc("id").Find(&idsMyInt)
+	err = testEngine.Table(userinfo).Cols(idName).Desc(idName).Find(&idsMyInt)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -352,8 +363,10 @@ func TestFindStrings(t *testing.T) {
 	assertSync(t, new(Userinfo))
 	userinfo := testEngine.GetTableMapper().Obj2Table("Userinfo")
 	username := testEngine.GetColumnMapper().Obj2Table("Username")
+	idName := colMapper.Obj2Table("Id")
+
 	var idsString []string
-	err := testEngine.Table(userinfo).Cols(username).Desc("id").Find(&idsString)
+	err := testEngine.Table(userinfo).Cols(username).Desc(idName).Find(&idsString)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -365,9 +378,10 @@ func TestFindMyString(t *testing.T) {
 	assertSync(t, new(Userinfo))
 	userinfo := testEngine.GetTableMapper().Obj2Table("Userinfo")
 	username := testEngine.GetColumnMapper().Obj2Table("Username")
+	idName := colMapper.Obj2Table("Id")
 
 	var idsMyString []MyString
-	err := testEngine.Table(userinfo).Cols(username).Desc("id").Find(&idsMyString)
+	err := testEngine.Table(userinfo).Cols(username).Desc(idName).Find(&idsMyString)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -380,8 +394,10 @@ func TestFindInterface(t *testing.T) {
 
 	userinfo := testEngine.GetTableMapper().Obj2Table("Userinfo")
 	username := testEngine.GetColumnMapper().Obj2Table("Username")
+	idName := colMapper.Obj2Table("Id")
+
 	var idsInterface []interface{}
-	err := testEngine.Table(userinfo).Cols(username).Desc("id").Find(&idsInterface)
+	err := testEngine.Table(userinfo).Cols(username).Desc(idName).Find(&idsInterface)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -393,8 +409,10 @@ func TestFindSliceBytes(t *testing.T) {
 	assertSync(t, new(Userinfo))
 
 	userinfo := testEngine.GetTableMapper().Obj2Table("Userinfo")
+	idName := colMapper.Obj2Table("Id")
+
 	var ids [][][]byte
-	err := testEngine.Table(userinfo).Desc("id").Find(&ids)
+	err := testEngine.Table(userinfo).Desc(idName).Find(&ids)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -408,8 +426,10 @@ func TestFindSlicePtrString(t *testing.T) {
 	assertSync(t, new(Userinfo))
 
 	userinfo := testEngine.GetTableMapper().Obj2Table("Userinfo")
+	idName := colMapper.Obj2Table("Id")
+
 	var ids [][]*string
-	err := testEngine.Table(userinfo).Desc("id").Find(&ids)
+	err := testEngine.Table(userinfo).Desc(idName).Find(&ids)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -423,8 +443,10 @@ func TestFindMapBytes(t *testing.T) {
 	assertSync(t, new(Userinfo))
 
 	userinfo := testEngine.GetTableMapper().Obj2Table("Userinfo")
+	idName := colMapper.Obj2Table("Id")
+
 	var ids []map[string][]byte
-	err := testEngine.Table(userinfo).Desc("id").Find(&ids)
+	err := testEngine.Table(userinfo).Desc(idName).Find(&ids)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -438,8 +460,10 @@ func TestFindMapPtrString(t *testing.T) {
 	assertSync(t, new(Userinfo))
 
 	userinfo := testEngine.GetTableMapper().Obj2Table("Userinfo")
+	idName := colMapper.Obj2Table("Id")
+
 	var ids []map[string]*string
-	err := testEngine.Table(userinfo).Desc("id").Find(&ids)
+	err := testEngine.Table(userinfo).Desc(idName).Find(&ids)
 	assert.NoError(t, err)
 	for _, record := range ids {
 		fmt.Println(record)
