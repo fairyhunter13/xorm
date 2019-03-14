@@ -153,8 +153,9 @@ func TestSumCustomColumn(t *testing.T) {
 	assert.NoError(t, err)
 	assert.EqualValues(t, 3, cnt)
 
+	intName := colMapper.Obj2Table("Int")
 	sumInt, err := testEngine.Sum(new(SumStruct2),
-		"CASE WHEN `int` <= 2 THEN `int` ELSE 0 END")
+		"CASE WHEN `"+intName+"` <= 2 THEN `"+intName+"` ELSE 0 END")
 	assert.NoError(t, err)
 	assert.EqualValues(t, 3, int(sumInt))
 }
@@ -214,8 +215,7 @@ func TestSQLCount(t *testing.T) {
 
 	tableName := tableMapper.Obj2Table("UserinfoCount2")
 	idName := colMapper.Obj2Table("Id")
-	total, err := testEngine.SQL("SELECT count(" + idName + ") FROM " + testEngine.TableName(tableName, true)).
-		Count()
+	total, err := testEngine.SQL("SELECT count(`" + idName + "`) FROM `" + testEngine.TableName(tableName, true) + "`").Count()
 	assert.NoError(t, err)
 	assert.EqualValues(t, 0, total)
 }
