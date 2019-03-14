@@ -72,8 +72,8 @@ func TestCombineTransaction(t *testing.T) {
 	_, err = session.Insert(&user1)
 	assert.NoError(t, err)
 
-	tableName := mapper.Obj2Table("Userinfo")
-	userName := mapper.Obj2Table("Username")
+	tableName := tableMapper.Obj2Table("Userinfo")
+	userName := colMapper.Obj2Table("Username")
 
 	user2 := Userinfo{Username: "zzz"}
 	_, err = session.Where("id = ?", 0).Update(&user2)

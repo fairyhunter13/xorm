@@ -48,7 +48,7 @@ func TestSetExpr(t *testing.T) {
 	if testEngine.Dialect().DBType() == core.MSSQL {
 		not = "~"
 	}
-	showName := mapper.Obj2Table("Show")
+	showName := colMapper.Obj2Table("Show")
 	cnt, err = testEngine.SetExpr(showName, not+" `"+showName+"`").ID(1).Update(new(UserExpr))
 	assert.NoError(t, err)
 	assert.EqualValues(t, 1, cnt)
@@ -82,8 +82,8 @@ func TestCols(t *testing.T) {
 	assert.NoError(t, err)
 
 	sess := testEngine.ID(1)
-	col1Name := mapper.Obj2Table("Col1")
-	col2Name := mapper.Obj2Table("Col2")
+	col1Name := colMapper.Obj2Table("Col1")
+	col2Name := colMapper.Obj2Table("Col2")
 	_, err = sess.Cols(col1Name).Cols(col2Name).Update(&ColsTable{
 		Col1: "",
 		Col2: "",
@@ -133,7 +133,7 @@ func TestMustCol(t *testing.T) {
 	}
 
 	customer.ParentId = 0
-	parentIDName := mapper.Obj2Table("ParentId")
+	parentIDName := colMapper.Obj2Table("ParentId")
 	affected, err := testEngine.MustCols(parentIDName).Update(&customer, &CustomerOnlyId{Id: customer.Id})
 	assert.NoError(t, err)
 	assert.EqualValues(t, 1, affected)

@@ -494,7 +494,7 @@ func TestDefaultTime3(t *testing.T) {
 		Cuser:     "userId",
 		Muser:     "userId",
 	}
-	endTimeName := mapper.Obj2Table("EndTime")
+	endTimeName := colMapper.Obj2Table("EndTime")
 	cnt, err := testEngine.Omit(endTimeName).InsertOne(prepareTask)
 	assert.NoError(t, err)
 	assert.EqualValues(t, 1, cnt)
