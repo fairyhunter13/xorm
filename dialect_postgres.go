@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-xorm/core"
+	"xorm.io/core"
 )
 
 // from http://www.***REMOVED***ql.org/docs/current/static/sql-keywords-appendix.html
