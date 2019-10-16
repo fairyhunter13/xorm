@@ -11,13 +11,6 @@ workspace:
   path: src/gitea.com/xorm/xorm
 
 steps:
-- name: init_***REMOVED***
-  pull: default
-  image: ***REMOVED***:9.5
-  commands:
-  - "until psql -U ***REMOVED*** -d ***REMOVED*** -h pgsql \\\n -c \"SELECT 1;\" >/dev/null 2>&1; do sleep 1; done\n"
-  - "psql -U ***REMOVED*** -d ***REMOVED*** -h pgsql \\\n  -c \"create schema xorm;\"\n"
-
 - name: build
   pull: default
   image: golang:1.10
@@ -181,13 +174,6 @@ workspace:
   path: src/gitea.com/xorm/xorm
 
 steps:
-- name: init_***REMOVED***
-  pull: default
-  image: ***REMOVED***:9.5
-  commands:
-  - "until psql -U ***REMOVED*** -d ***REMOVED*** -h pgsql \\\n -c \"SELECT 1;\" >/dev/null 2>&1; do sleep 1; done\n"
-  - "psql -U ***REMOVED*** -d ***REMOVED*** -h pgsql \\\n  -c \"create schema xorm;\"\n"
-
 - name: build
   pull: default
   image: golang:1.11
