@@ -165,7 +165,7 @@ func TestNullStructUpdate(t *testing.T) {
 
 	if true { // 测试In update
 		item := new(NullType)
-		item.Age = sql.NullInt64{23, true}
+		item.Age = sql.NullInt64{Int64: 23, Valid: true}
 		affected, err := testEngine.In(idName, 3, 4).Cols(ageName, heightName, isManName).Update(item)
 		assert.NoError(t, err)
 		assert.EqualValues(t, 2, affected)
