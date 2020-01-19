@@ -763,7 +763,7 @@ func (statement *Statement) Join(joinOP string, tablename interface{}, condition
 		statement.joinArgs = append(statement.joinArgs, subQueryArgs...)
 	default:
 		tbName := statement.Engine.TableName(tablename, true)
-		fmt.Fprintf(&buf, "%s ON %v", statement.Engine.Quote(tbName), condition)
+		fmt.Fprintf(&buf, "%s ON %v", tbName, condition)
 	}
 
 	statement.JoinStr = buf.String()
