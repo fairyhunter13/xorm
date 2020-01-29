@@ -215,14 +215,15 @@ func quoteTo(buf *strings.Builder, quotePair string, value string) {
 		_, _ = buf.WriteString(value)
 		return
 	}
-	
-	prefix, suffix := quotePair[0], quotePair[1]
 
+	prefix, suffix := quotePair[0], quotePair[1]
+	lastCh := 0 // 0 prefix, 1 char, 2 suffix
 	i := 0
 	for i < len(value) {
 		// start of a token; might be already quoted
 		if value[i] == '.' {
 			_ = buf.WriteByte('.')
+			lastCh = 1
 			i++
 		} else if value[i] == prefix || value[i] == '`' {
 			// Has quotes; skip/normalize `name` to prefix+name+sufix
@@ -234,18 +235,37 @@ func quoteTo(buf *strings.Builder, quotePair string, value string) {
 			}
 			i++
 			_ = buf.WriteByte(prefix)
-			for ; i < len(value) && value[i] != ch; i++ {
+			lastCh = 0
+			for ; i < len(value) && value[i] != ch && value[i] != ' '; i++ {
 				_ = buf.WriteByte(value[i])
+				lastCh = 1
 			}
 			_ = buf.WriteByte(suffix)
+			lastCh = 2
 			i++
+		} else if value[i] == ' ' {
+			if lastCh != 2 {
+				_ = buf.WriteByte(suffix)
+				lastCh = 2
+			}
+
+			// a AS b or a b
+			for ; i < len(value); i++ {
+				if value[i] != ' ' && value[i-1] == ' ' && (len(value) > i+1 && !strings.EqualFold(value[i:i+2], "AS")) {
+					break
+				}
+				_ = buf.WriteByte(value[i])
+				lastCh = 1
+			}
 		} else {
 			// Requires quotes
 			_ = buf.WriteByte(prefix)
-			for ; i < len(value) && value[i] != '.'; i++ {
+			for ; i < len(value) && value[i] != '.' && value[i] != ' '; i++ {
 				_ = buf.WriteByte(value[i])
+				lastCh = 1
 			}
 			_ = buf.WriteByte(suffix)
+			lastCh = 2
 		}
 	}
 }
@@ -918,10 +938,18 @@ var (
 )
 
 func (engine *Engine) mapType(v reflect.Value) (*core.Table, error) {
-	t := v.Type()
 	table := core.NewEmptyTable()
+	table.Name = tbNameForMap(engine.TableMapper, v)
+
+	t := v.Type()
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+		v = v.Elem()
+	}
+
 	table.Type = t
-	table.Name = engine.tbNameForMap(v)
+
+	fmt.Println("======", table.Name)
 
 	var idFieldColName string
 	var hasCacheTag, hasNoCacheTag bool

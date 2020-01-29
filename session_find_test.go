@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"xorm.io/core"
 	"github.com/stretchr/testify/assert"
+	"xorm.io/core"
 )
 
 func TestJoinLimit(t *testing.T) {
@@ -799,5 +799,27 @@ func TestFindJoin(t *testing.T) {
 	scenes = make([]SceneItem, 0)
 	err = testEngine.Join("LEFT OUTER", new(DeviceUserPrivrels), "device_user_privrels.device_id=scene_item.device_id").
 		Where("scene_item.type=?", 3).Or("device_user_privrels.user_id=?", 339).Find(&scenes)
+	assert.NoError(t, err)
+}
+
+func TestJoinReverseWord(t *testing.T) {
+	type JoinReverseWord struct {
+		Id   int64
+		Name string
+	}
+
+	type JoinReverseWord2 struct {
+		Id     int64
+		UserId int64 `xorm:"index"`
+		Age    int
+	}
+
+	assert.NoError(t, prepareEngine())
+	err := testEngine.Table("order").Sync2(new(JoinReverseWord))
+	assert.NoError(t, err)
+	assertSync(t, new(JoinReverseWord2))
+
+	var j2 []JoinReverseWord2
+	err = testEngine.Join("INNER", "order", "`join_reverse_word2`.user_id=`order`.id").Find(&j2)
 	assert.NoError(t, err)
 }
