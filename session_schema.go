@@ -245,9 +245,13 @@ func (session *Session) Sync2(beans ...interface{}) error {
 		if err != nil {
 			return err
 		}
-		var tbName string
-		if len(session.statement.AltTableName) > 0 {
-			tbName = session.statement.AltTableName
+
+		var (
+			tbName       string
+			altTableName = session.statement.altTableName
+		)
+		if len(altTableName) > 0 {
+			tbName = altTableName
 		} else {
 			tbName = engine.TableName(bean)
 		}
@@ -298,7 +302,7 @@ func (session *Session) Sync2(beans ...interface{}) error {
 			// column is not exist on table
 			if oriCol == nil {
 				session.statement.RefTable = table
-				session.statement.tableName = tbNameWithSchema
+				session.statement.altTableName = altTableName
 				if err = session.addColumn(col.Name); err != nil {
 					return err
 				}
@@ -406,11 +410,11 @@ func (session *Session) Sync2(beans ...interface{}) error {
 		for name, index := range addedNames {
 			if index.Type == core.UniqueType {
 				session.statement.RefTable = table
-				session.statement.tableName = tbNameWithSchema
+				session.statement.altTableName = altTableName
 				err = session.addUnique(tbNameWithSchema, name)
 			} else if index.Type == core.IndexType {
 				session.statement.RefTable = table
-				session.statement.tableName = tbNameWithSchema
+				session.statement.altTableName = altTableName
 				err = session.addIndex(tbNameWithSchema, name)
 			}
 			if err != nil {

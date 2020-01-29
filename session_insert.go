@@ -324,7 +324,9 @@ func (session *Session) innerInsert(bean interface{}) (int64, error) {
 	if err := session.statement.setRefBean(bean); err != nil {
 		return 0, err
 	}
-	if len(session.statement.TableName()) <= 0 {
+	var tableName = session.statement.TableName()
+	fmt.Println("------", tableName)
+	if len(tableName) <= 0 {
 		return 0, ErrTableNotFound
 	}
 
@@ -351,7 +353,6 @@ func (session *Session) innerInsert(bean interface{}) (int64, error) {
 		colPlaces = colPlaces[0 : len(colPlaces)-2]
 	}
 
-	var tableName = session.statement.TableName()
 	var output string
 	if session.engine.dialect.DBType() == core.MSSQL && len(table.AutoIncrement) > 0 {
 		output = fmt.Sprintf(" OUTPUT Inserted.%s", table.AutoIncrement)

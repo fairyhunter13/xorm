@@ -115,8 +115,8 @@ func (session *Session) find(rowsSlicePtr interface{}, condiBean ...interface{})
 				var colName = session.engine.Quote(col.Name)
 				if addedTableName {
 					var nm = session.statement.TableName()
-					if len(session.statement.TableAlias) > 0 {
-						nm = session.statement.TableAlias
+					if len(session.statement.tableAlias) > 0 {
+						nm = session.statement.tableAlias
 					}
 					colName = session.engine.Quote(nm) + "." + colName
 				}

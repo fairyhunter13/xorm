@@ -492,6 +492,8 @@ func TestGetCustomTableInterface(t *testing.T) {
 	assert.NoError(t, err)
 	assert.True(t, exist)
 
+	assert.EqualValues(t, getCustomTableName, testEngine.TableInfo(new(MyGetCustomTableImpletation)).Name)
+
 	_, err = testEngine.Insert(&MyGetCustomTableImpletation{
 		Name: "xlw",
 	})
