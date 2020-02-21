@@ -115,6 +115,86 @@ steps:
   environment:
     GO111MODULE: "on"
     GOPROXY: "https://goproxy.cn"
+    TEST_ORACLE_HOST: ***REMOVED***:1521
+    TEST_ORACLE_DBNAME: xe
+    TEST_ORACLE_USERNAME: system
+    TEST_ORACLE_PASSWORD: ***REMOVED***
+    TEST_CACHE_ENABLE: false
+  commands:
+  - make test-***REMOVED***
+  when:
+    event:
+    - push
+    - pull_request
+
+- name: test-***REMOVED***-cache
+  pull: default
+  image: golang:1.12
+  depends_on:
+    - test-***REMOVED***
+  environment:
+    GO111MODULE: "on"
+    GOPROXY: "https://goproxy.cn"
+    TEST_ORACLE_HOST: ***REMOVED***:1521
+    TEST_ORACLE_DBNAME: xe
+    TEST_ORACLE_USERNAME: system
+    TEST_ORACLE_PASSWORD: ***REMOVED***
+    TEST_CACHE_ENABLE: true
+  commands:
+  - make test-***REMOVED***
+  when:
+    event:
+    - push
+    - pull_request
+
+- name: test-***REMOVED***-schema
+  pull: default
+  image: golang:1.12
+  environment:
+    GO111MODULE: "on"
+    GOPROXY: "https://goproxy.cn"
+    TEST_ORACLE_SCHEMA: xorm
+    TEST_ORACLE_HOST: ***REMOVED***:1521
+    TEST_ORACLE_DBNAME: xe
+    TEST_ORACLE_USERNAME: system
+    TEST_ORACLE_PASSWORD: ***REMOVED***
+    TEST_CACHE_ENABLE: false
+    SCHEMA: xorm
+  commands:
+  - make test-***REMOVED***
+  when:
+    event:
+    - push
+    - pull_request
+
+- name: test-***REMOVED***-schema-cache
+  pull: default
+  image: golang:1.12
+  depends_on:
+    - test-***REMOVED***-schema
+  environment:
+    GO111MODULE: "on"
+    GOPROXY: "https://goproxy.cn"
+    TEST_ORACLE_SCHEMA: xorm
+    TEST_ORACLE_HOST: ***REMOVED***:1521
+    TEST_ORACLE_DBNAME: xe
+    TEST_ORACLE_USERNAME: system
+    TEST_ORACLE_PASSWORD: ***REMOVED***
+    TEST_CACHE_ENABLE: true
+    SCHEMA: xorm
+  commands:
+  - make test-***REMOVED***
+  when:
+    event:
+    - push
+    - pull_request
+
+- name: test-***REMOVED***
+  pull: default
+  image: golang:1.12
+  environment:
+    GO111MODULE: "on"
+    GOPROXY: "https://goproxy.cn"
     TEST_PGSQL_HOST: pgsql
     TEST_PGSQL_DBNAME: ***REMOVED***
     TEST_PGSQL_USERNAME: ***REMOVED***
@@ -286,6 +366,18 @@ services:
 - name: tidb
   pull: default
   image: pingcap/tidb:v3.0.3
+  when:
+    event:
+    - push
+    - tag
+    - pull_request
+
+- name: ***REMOVED***
+  pull: default
+  image: ***REMOVED***inanutshell/***REMOVED***-xe-11g:latest
+  environment:
+    ORACLE_ALLOW_REMOTE: true
+    ORACLE_ENABLE_XDB: true
   when:
     event:
     - push

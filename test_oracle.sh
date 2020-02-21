@@ -1,1 +1,0 @@
-go test -tags=***REMOVED*** -db=oci8 -conn_str="system/***REMOVED***@localhost:1521/xe"
