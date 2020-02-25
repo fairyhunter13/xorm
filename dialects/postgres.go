@@ -859,9 +859,8 @@ func (db ****REMOVED***) IsReserved(name string) bool {
 	return ok
 }
 
-func (db ****REMOVED***) Quote(name string) string {
-	name = strings.Replace(name, ".", `"."`, -1)
-	return "\"" + name + "\""
+func (db ****REMOVED***) Quoter() schemas.Quoter {
+	return schemas.Quoter{`"`, `"`}
 }
 
 func (db ****REMOVED***) AutoIncrStr() string {
@@ -911,7 +910,6 @@ func (db ****REMOVED***) ModifyColumnSQL(tableName string, col *schemas.Column) 
 }
 
 func (db ****REMOVED***) DropIndexSQL(tableName string, index *schemas.Index) string {
-	quote := db.Quote
 	idxName := index.Name
 
 	tableParts := strings.Split(strings.Replace(tableName, `"`, "", -1), ".")
@@ -928,7 +926,7 @@ func (db ****REMOVED***) DropIndexSQL(tableName string, index *schemas.Index) st
 	if db.uri.Schema != "" {
 		idxName = db.uri.Schema + "." + idxName
 	}
-	return fmt.Sprintf("DROP INDEX %v", quote(idxName))
+	return fmt.Sprintf("DROP INDEX %v", db.Quoter().Quote(idxName))
 }
 
 func (db ****REMOVED***) IsColumnExist(tableName, colName string) (bool, error) {
@@ -1161,7 +1159,7 @@ func (db ****REMOVED***) GetIndexes(tableName string) (map[string]*schemas.Index
 }
 
 func (db ****REMOVED***) Filters() []Filter {
-	return []Filter{&IdFilter{}, &QuoteFilter{}, &SeqFilter{Prefix: "$", Start: 1}}
+	return []Filter{&QuoteFilter{}, &SeqFilter{Prefix: "$", Start: 1}}
 }
 
 type pqDriver struct {
