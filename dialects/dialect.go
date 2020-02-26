@@ -207,7 +207,7 @@ func regDrvsNDialects() bool {
 		"pgx":      {"***REMOVED***", func() Driver { return &pqDriverPgx{} }, func() Dialect { return &***REMOVED***{} }},
 		"sqlite3":  {"sqlite3", func() Driver { return &sqlite3Driver{} }, func() Dialect { return &sqlite3{} }},
 		"oci8":     {"***REMOVED***", func() Driver { return &oci8Driver{} }, func() Dialect { return &***REMOVED***{} }},
-		"g***REMOVED***":  {"***REMOVED***", func() Driver { return &g***REMOVED***Driver{} }, func() Dialect { return &***REMOVED***{} }},
+		"godror":   {"***REMOVED***", func() Driver { return &godrorDriver{} }, func() Dialect { return &***REMOVED***{} }},
 	}
 
 	for driverName, v := range providedDrvsNDialects {
