@@ -848,7 +848,10 @@ func (db ****REMOVED***) GetIndexes(tableName string) (map[string]*schemas.Index
 }
 
 func (db ****REMOVED***) Filters() []Filter {
-	return []Filter{&QuoteFilter{}, &SeqFilter{Prefix: ":", Start: 1}}
+	return []Filter{
+		&QuoteFilter{db.Quoter()},
+		&SeqFilter{Prefix: ":", Start: 1},
+	}
 }
 
 type g***REMOVED***Driver struct {
