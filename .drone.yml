@@ -15,7 +15,7 @@ steps:
       - '${GOPATH}/pkg/mod'
   volumes:
   - name: cache
-    path: /tmp/cache
+    path: /tmp
 
 - name: test-vet
   image: golang:1.11
@@ -45,7 +45,7 @@ steps:
       - '${GOPATH}/pkg/mod'
   volumes:
   - name: cache
-    path: /tmp/cache
+    path: /tmp
 
 - name: test-sqlite
   image: golang:1.12
