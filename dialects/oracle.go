@@ -554,7 +554,7 @@ func (db ****REMOVED***) IsReserved(name string) bool {
 }
 
 func (db ****REMOVED***) Quoter() schemas.Quoter {
-	return schemas.Quoter{"[", "]"}
+	return schemas.Quoter{"\"", "\""}
 }
 
 func (db ****REMOVED***) SupportEngine() bool {
