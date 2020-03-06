@@ -766,30 +766,27 @@ var (
 		"YES":                              true,
 		"ZONE":                             true,
 	}
-
-	// DefaultPostgresSchema default ***REMOVED*** schema
-	DefaultPostgresSchema = "public"
 )
 
-const PostgresPublicSchema = "public"
+const ***REMOVED***PublicSchema = "public"
 
 type ***REMOVED*** struct {
 	Base
 }
 
-func (db ****REMOVED***) Init(d *core.DB, uri *URI, drivername, dataSourceName string) error {
-	err := db.Base.Init(d, db, uri, drivername, dataSourceName)
+func (db ****REMOVED***) Init(d *core.DB, uri *URI) error {
+	err := db.Base.Init(d, db, uri)
 	if err != nil {
 		return err
 	}
 	if db.uri.Schema == "" {
-		db.uri.Schema = DefaultPostgresSchema
+		db.uri.Schema = ***REMOVED***PublicSchema
 	}
 	return nil
 }
 
 func (db ****REMOVED***) DefaultSchema() string {
-	return PostgresPublicSchema
+	return ***REMOVED***PublicSchema
 }
 
 func (db ****REMOVED***) SQLType(c *schemas.Column) string {

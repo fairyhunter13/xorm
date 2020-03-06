@@ -504,8 +504,8 @@ type ***REMOVED*** struct {
 	Base
 }
 
-func (db ****REMOVED***) Init(d *core.DB, uri *URI, drivername, dataSourceName string) error {
-	return db.Base.Init(d, db, uri, drivername, dataSourceName)
+func (db ****REMOVED***) Init(d *core.DB, uri *URI) error {
+	return db.Base.Init(d, db, uri)
 }
 
 func (db ****REMOVED***) SQLType(c *schemas.Column) string {
