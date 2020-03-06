@@ -766,6 +766,8 @@ var (
 		"YES":                              true,
 		"ZONE":                             true,
 	}
+
+	***REMOVED***Quoter = schemas.Quoter{'"', '"', schemas.AlwaysReserve}
 )
 
 const ***REMOVED***PublicSchema = "public"
@@ -775,6 +777,7 @@ type ***REMOVED*** struct {
 }
 
 func (db ****REMOVED***) Init(d *core.DB, uri *URI) error {
+	db.quoter = ***REMOVED***Quoter
 	err := db.Base.Init(d, db, uri)
 	if err != nil {
 		return err
@@ -783,6 +786,35 @@ func (db ****REMOVED***) Init(d *core.DB, uri *URI) error {
 		db.uri.Schema = ***REMOVED***PublicSchema
 	}
 	return nil
+}
+
+func (db ****REMOVED***) needQuote(name string) bool {
+	if db.IsReserved(name) {
+		return true
+	}
+	for _, c := range name {
+		if c >= 'A' && c <= 'Z' {
+			return true
+		}
+	}
+	return false
+}
+
+func (db ****REMOVED***) SetQuotePolicy(quotePolicy QuotePolicy) {
+	switch quotePolicy {
+	case QuotePolicyNone:
+		var q = ***REMOVED***Quoter
+		q.IsReserved = schemas.AlwaysNoReserve
+		db.quoter = q
+	case QuotePolicyReserved:
+		var q = ***REMOVED***Quoter
+		q.IsReserved = db.needQuote
+		db.quoter = q
+	case QuotePolicyAlways:
+		fallthrough
+	default:
+		db.quoter = ***REMOVED***Quoter
+	}
 }
 
 func (db ****REMOVED***) DefaultSchema() string {
@@ -857,12 +889,8 @@ func (db ****REMOVED***) SupportInsertMany() bool {
 }
 
 func (db ****REMOVED***) IsReserved(name string) bool {
-	_, ok := ***REMOVED***ReservedWords[name]
+	_, ok := ***REMOVED***ReservedWords[strings.ToUpper(name)]
 	return ok
-}
-
-func (db ****REMOVED***) Quoter() schemas.Quoter {
-	return schemas.Quoter{`"`, `"`}
 }
 
 func (db ****REMOVED***) AutoIncrStr() string {

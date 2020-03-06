@@ -498,6 +498,8 @@ var (
 		"YEAR":                      true,
 		"ZONE":                      true,
 	}
+
+	***REMOVED***Quoter = schemas.Quoter{'[', ']', schemas.AlwaysReserve}
 )
 
 type ***REMOVED*** struct {
@@ -505,6 +507,7 @@ type ***REMOVED*** struct {
 }
 
 func (db ****REMOVED***) Init(d *core.DB, uri *URI) error {
+	db.quoter = ***REMOVED***Quoter
 	return db.Base.Init(d, db, uri)
 }
 
@@ -549,12 +552,8 @@ func (db ****REMOVED***) SupportInsertMany() bool {
 }
 
 func (db ****REMOVED***) IsReserved(name string) bool {
-	_, ok := ***REMOVED***ReservedWords[name]
+	_, ok := ***REMOVED***ReservedWords[strings.ToUpper(name)]
 	return ok
-}
-
-func (db ****REMOVED***) Quoter() schemas.Quoter {
-	return schemas.Quoter{"\"", "\""}
 }
 
 func (db ****REMOVED***) SupportEngine() bool {
@@ -601,7 +600,7 @@ func (db ****REMOVED***) CreateTableSQL(table *schemas.Table, tableName, storeEn
 
 	if len(pkList) > 0 {
 		sql += "PRIMARY KEY ( "
-		sql += quoter.Quote(strings.Join(pkList, quoter.ReverseQuote(",")))
+		sql += quoter.Join(pkList, ",")
 		sql += " ), "
 	}
 
@@ -618,6 +617,23 @@ func (db ****REMOVED***) CreateTableSQL(table *schemas.Table, tableName, storeEn
 		}
 	}
 	return sql
+}
+
+func (db ****REMOVED***) SetQuotePolicy(quotePolicy QuotePolicy) {
+	switch quotePolicy {
+	case QuotePolicyNone:
+		var q = ***REMOVED***Quoter
+		q.IsReserved = schemas.AlwaysNoReserve
+		db.quoter = q
+	case QuotePolicyReserved:
+		var q = ***REMOVED***Quoter
+		q.IsReserved = db.IsReserved
+		db.quoter = q
+	case QuotePolicyAlways:
+		fallthrough
+	default:
+		db.quoter = ***REMOVED***Quoter
+	}
 }
 
 func (db ****REMOVED***) IndexCheckSQL(tableName, idxName string) (string, []interface{}) {
