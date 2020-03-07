@@ -547,24 +547,16 @@ func (db ****REMOVED***) AutoIncrStr() string {
 	return "AUTO_INCREMENT"
 }
 
-func (db ****REMOVED***) SupportInsertMany() bool {
-	return true
-}
-
 func (db ****REMOVED***) IsReserved(name string) bool {
 	_, ok := ***REMOVED***ReservedWords[strings.ToUpper(name)]
 	return ok
 }
 
-func (db ****REMOVED***) SupportDropIfExists() bool {
-	return false
+func (db ****REMOVED***) DropTableSQL(tableName string) (string, bool) {
+	return fmt.Sprintf("DROP TABLE `%s`", tableName), false
 }
 
-func (db ****REMOVED***) DropTableSQL(tableName string) string {
-	return fmt.Sprintf("DROP TABLE `%s`", tableName)
-}
-
-func (db ****REMOVED***) CreateTableSQL(table *schemas.Table, tableName string) string {
+func (db ****REMOVED***) CreateTableSQL(table *schemas.Table, tableName string) (string, bool) {
 	var sql = "CREATE TABLE "
 	if tableName == "" {
 		tableName = table.Name
@@ -593,7 +585,7 @@ func (db ****REMOVED***) CreateTableSQL(table *schemas.Table, tableName string) 
 	}
 
 	sql = sql[:len(sql)-2] + ")"
-	return sql
+	return sql, false
 }
 
 func (db ****REMOVED***) SetQuotePolicy(quotePolicy QuotePolicy) {
@@ -619,26 +611,15 @@ func (db ****REMOVED***) IndexCheckSQL(tableName, idxName string) (string, []int
 		`WHERE TABLE_NAME = :1 AND INDEX_NAME = :2`, args
 }
 
-func (db ****REMOVED***) TableCheckSQL(tableName string) (string, []interface{}) {
-	args := []interface{}{tableName}
-	return `SELECT table_name FROM user_tables WHERE table_name = :1`, args
+func (db ****REMOVED***) IsTableExist(ctx context.Context, tableName string) (bool, error) {
+	return db.HasRecords(ctx, `SELECT table_name FROM user_tables WHERE table_name = :1`, tableName)
 }
 
 func (db ****REMOVED***) IsColumnExist(ctx context.Context, tableName, colName string) (bool, error) {
 	args := []interface{}{tableName, colName}
 	query := "SELECT column_name FROM USER_TAB_COLUMNS WHERE table_name = :1" +
 		" AND column_name = :2"
-
-	rows, err := db.DB().QueryContext(ctx, query, args...)
-	if err != nil {
-		return false, err
-	}
-	defer rows.Close()
-
-	if rows.Next() {
-		return true, nil
-	}
-	return false, nil
+	return db.HasRecords(ctx, query, args...)
 }
 
 func (db ****REMOVED***) GetColumns(ctx context.Context, tableName string) ([]string, map[string]*schemas.Column, error) {

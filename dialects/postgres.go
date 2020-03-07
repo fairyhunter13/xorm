@@ -884,10 +884,6 @@ func (db ****REMOVED***) SQLType(c *schemas.Column) string {
 	return res
 }
 
-func (db ****REMOVED***) SupportInsertMany() bool {
-	return true
-}
-
 func (db ****REMOVED***) IsReserved(name string) bool {
 	_, ok := ***REMOVED***ReservedWords[strings.ToUpper(name)]
 	return ok
@@ -897,7 +893,7 @@ func (db ****REMOVED***) AutoIncrStr() string {
 	return ""
 }
 
-func (db ****REMOVED***) CreateTableSQL(table *schemas.Table, tableName string) string {
+func (db ****REMOVED***) CreateTableSQL(table *schemas.Table, tableName string) (string, bool) {
 	var sql string
 	sql = "CREATE TABLE IF NOT EXISTS "
 	if tableName == "" {
@@ -932,7 +928,7 @@ func (db ****REMOVED***) CreateTableSQL(table *schemas.Table, tableName string) 
 	}
 	sql += ")"
 
-	return sql
+	return sql, true
 }
 
 func (db ****REMOVED***) IndexCheckSQL(tableName, idxName string) (string, []interface{}) {
@@ -946,14 +942,13 @@ func (db ****REMOVED***) IndexCheckSQL(tableName, idxName string) (string, []int
 		`WHERE schemaname = ? AND tablename = ? AND indexname = ?`, args
 }
 
-func (db ****REMOVED***) TableCheckSQL(tableName string) (string, []interface{}) {
+func (db ****REMOVED***) IsTableExist(ctx context.Context, tableName string) (bool, error) {
 	if len(db.uri.Schema) == 0 {
-		args := []interface{}{tableName}
-		return `SELECT tablename FROM pg_tables WHERE tablename = ?`, args
+		return db.HasRecords(ctx, `SELECT tablename FROM pg_tables WHERE tablename = $1`, tableName)
 	}
 
-	args := []interface{}{db.uri.Schema, tableName}
-	return `SELECT tablename FROM pg_tables WHERE schemaname = ? AND tablename = ?`, args
+	return db.HasRecords(ctx, `SELECT tablename FROM pg_tables WHERE schemaname = $1 AND tablename = $2`,
+		db.uri.Schema, tableName)
 }
 
 func (db ****REMOVED***) ModifyColumnSQL(tableName string, col *schemas.Column) string {
