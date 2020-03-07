@@ -897,16 +897,42 @@ func (db ****REMOVED***) AutoIncrStr() string {
 	return ""
 }
 
-func (db ****REMOVED***) SupportEngine() bool {
-	return false
-}
+func (db ****REMOVED***) CreateTableSQL(table *schemas.Table, tableName string) string {
+	var sql string
+	sql = "CREATE TABLE IF NOT EXISTS "
+	if tableName == "" {
+		tableName = table.Name
+	}
 
-func (db ****REMOVED***) SupportCharset() bool {
-	return false
-}
+	quoter := db.Quoter()
+	sql += quoter.Quote(tableName)
+	sql += " ("
 
-func (db ****REMOVED***) IndexOnTable() bool {
-	return false
+	if len(table.ColumnsSeq()) > 0 {
+		pkList := table.PrimaryKeys
+
+		for _, colName := range table.ColumnsSeq() {
+			col := table.GetColumn(colName)
+			if col.IsPrimaryKey && len(pkList) == 1 {
+				sql += db.String(col)
+			} else {
+				sql += db.StringNoPk(col)
+			}
+			sql = strings.TrimSpace(sql)
+			sql += ", "
+		}
+
+		if len(pkList) > 1 {
+			sql += "PRIMARY KEY ( "
+			sql += quoter.Join(pkList, ",")
+			sql += " ), "
+		}
+
+		sql = sql[:len(sql)-2]
+	}
+	sql += ")"
+
+	return sql
 }
 
 func (db ****REMOVED***) IndexCheckSQL(tableName, idxName string) (string, []interface{}) {

@@ -556,19 +556,7 @@ func (db ****REMOVED***) IsReserved(name string) bool {
 	return ok
 }
 
-func (db ****REMOVED***) SupportEngine() bool {
-	return false
-}
-
-func (db ****REMOVED***) SupportCharset() bool {
-	return false
-}
-
 func (db ****REMOVED***) SupportDropIfExists() bool {
-	return false
-}
-
-func (db ****REMOVED***) IndexOnTable() bool {
 	return false
 }
 
@@ -576,7 +564,7 @@ func (db ****REMOVED***) DropTableSQL(tableName string) string {
 	return fmt.Sprintf("DROP TABLE `%s`", tableName)
 }
 
-func (db ****REMOVED***) CreateTableSQL(table *schemas.Table, tableName, storeEngine, charset string) string {
+func (db ****REMOVED***) CreateTableSQL(table *schemas.Table, tableName string) string {
 	var sql = "CREATE TABLE "
 	if tableName == "" {
 		tableName = table.Name
@@ -605,17 +593,6 @@ func (db ****REMOVED***) CreateTableSQL(table *schemas.Table, tableName, storeEn
 	}
 
 	sql = sql[:len(sql)-2] + ")"
-	if db.SupportEngine() && storeEngine != "" {
-		sql += " ENGINE=" + storeEngine
-	}
-	if db.SupportCharset() {
-		if len(charset) == 0 {
-			charset = db.URI().Charset
-		}
-		if len(charset) > 0 {
-			sql += " DEFAULT CHARSET " + charset
-		}
-	}
 	return sql
 }
 
