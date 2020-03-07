@@ -500,8 +500,8 @@ var (
 	}
 
 	***REMOVED***Quoter = schemas.Quoter{
-		Prefix:     '[',
-		Suffix:     ']',
+		Prefix:     '"',
+		Suffix:     '"',
 		IsReserved: schemas.AlwaysReserve,
 	}
 )
