@@ -893,7 +893,7 @@ func (db ****REMOVED***) AutoIncrStr() string {
 	return ""
 }
 
-func (db ****REMOVED***) CreateTableSQL(table *schemas.Table, tableName string) (string, bool) {
+func (db ****REMOVED***) CreateTableSQL(table *schemas.Table, tableName string) ([]string, bool) {
 	var sql string
 	sql = "CREATE TABLE IF NOT EXISTS "
 	if tableName == "" {
@@ -928,7 +928,7 @@ func (db ****REMOVED***) CreateTableSQL(table *schemas.Table, tableName string) 
 	}
 	sql += ")"
 
-	return sql, true
+	return []string{sql}, true
 }
 
 func (db ****REMOVED***) IndexCheckSQL(tableName, idxName string) (string, []interface{}) {
