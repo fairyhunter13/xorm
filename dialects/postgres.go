@@ -1231,7 +1231,7 @@ func (db ****REMOVED***) GetIndexes(ctx context.Context, tableName string) (map[
 }
 
 func (db ****REMOVED***) Filters() []Filter {
-	return []Filter{&QuoteFilter{db.Quoter()}, &SeqFilter{Prefix: "$", Start: 1}}
+	return []Filter{&SeqFilter{Prefix: "$", Start: 1}}
 }
 
 type pqDriver struct {
