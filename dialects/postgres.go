@@ -776,9 +776,9 @@ type ***REMOVED*** struct {
 	Base
 }
 
-func (db ****REMOVED***) Init(d *core.DB, uri *URI) error {
+func (db ****REMOVED***) Init(uri *URI) error {
 	db.quoter = ***REMOVED***Quoter
-	err := db.Base.Init(d, db, uri)
+	err := db.Base.Init(db, uri)
 	if err != nil {
 		return err
 	}
@@ -942,12 +942,12 @@ func (db ****REMOVED***) IndexCheckSQL(tableName, idxName string) (string, []int
 		`WHERE schemaname = ? AND tablename = ? AND indexname = ?`, args
 }
 
-func (db ****REMOVED***) IsTableExist(ctx context.Context, tableName string) (bool, error) {
+func (db ****REMOVED***) IsTableExist(queryer core.Queryer, ctx context.Context, tableName string) (bool, error) {
 	if len(db.uri.Schema) == 0 {
-		return db.HasRecords(ctx, `SELECT tablename FROM pg_tables WHERE tablename = $1`, tableName)
+		return db.HasRecords(queryer, ctx, `SELECT tablename FROM pg_tables WHERE tablename = $1`, tableName)
 	}
 
-	return db.HasRecords(ctx, `SELECT tablename FROM pg_tables WHERE schemaname = $1 AND tablename = $2`,
+	return db.HasRecords(queryer, ctx, `SELECT tablename FROM pg_tables WHERE schemaname = $1 AND tablename = $2`,
 		db.uri.Schema, tableName)
 }
 
@@ -980,7 +980,7 @@ func (db ****REMOVED***) DropIndexSQL(tableName string, index *schemas.Index) st
 	return fmt.Sprintf("DROP INDEX %v", db.Quoter().Quote(idxName))
 }
 
-func (db ****REMOVED***) IsColumnExist(ctx context.Context, tableName, colName string) (bool, error) {
+func (db ****REMOVED***) IsColumnExist(queryer core.Queryer, ctx context.Context, tableName, colName string) (bool, error) {
 	args := []interface{}{db.uri.Schema, tableName, colName}
 	query := "SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema = $1 AND table_name = $2" +
 		" AND column_name = $3"
@@ -990,7 +990,7 @@ func (db ****REMOVED***) IsColumnExist(ctx context.Context, tableName, colName s
 			" AND column_name = $2"
 	}
 
-	rows, err := db.DB().QueryContext(ctx, query, args...)
+	rows, err := queryer.QueryContext(ctx, query, args...)
 	if err != nil {
 		return false, err
 	}
@@ -999,7 +999,7 @@ func (db ****REMOVED***) IsColumnExist(ctx context.Context, tableName, colName s
 	return rows.Next(), nil
 }
 
-func (db ****REMOVED***) GetColumns(ctx context.Context, tableName string) ([]string, map[string]*schemas.Column, error) {
+func (db ****REMOVED***) GetColumns(queryer core.Queryer, ctx context.Context, tableName string) ([]string, map[string]*schemas.Column, error) {
 	args := []interface{}{db.uri.Schema, tableName, db.uri.Schema}
 	s := `SELECT column_name, column_default, is_nullable, data_type, character_maximum_length,
     CASE WHEN p.contype = 'p' THEN true ELSE false END AS primarykey,
@@ -1013,7 +1013,7 @@ FROM pg_attribute f
     LEFT JOIN INFORMATION_SCHEMA.COLUMNS s ON s.column_name=f.attname AND c.relname=s.table_name
 WHERE n.nspname= $1 AND c.relkind = 'r'::char AND c.relname = $2 AND s.table_schema = $3 AND f.attnum > 0 ORDER BY f.attnum;`
 
-	rows, err := db.DB().QueryContext(ctx, s, args...)
+	rows, err := queryer.QueryContext(ctx, s, args...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -1132,7 +1132,7 @@ WHERE n.nspname= $1 AND c.relkind = 'r'::char AND c.relname = $2 AND s.table_sch
 	return colSeq, cols, nil
 }
 
-func (db ****REMOVED***) GetTables(ctx context.Context) ([]*schemas.Table, error) {
+func (db ****REMOVED***) GetTables(queryer core.Queryer, ctx context.Context) ([]*schemas.Table, error) {
 	args := []interface{}{}
 	s := "SELECT tablename FROM pg_tables"
 	if len(db.uri.Schema) != 0 {
@@ -1140,7 +1140,7 @@ func (db ****REMOVED***) GetTables(ctx context.Context) ([]*schemas.Table, error
 		s = s + " WHERE schemaname = $1"
 	}
 
-	rows, err := db.DB().QueryContext(ctx, s, args...)
+	rows, err := queryer.QueryContext(ctx, s, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -1171,7 +1171,7 @@ func getIndexColName(indexdef string) []string {
 	return colNames
 }
 
-func (db ****REMOVED***) GetIndexes(ctx context.Context, tableName string) (map[string]*schemas.Index, error) {
+func (db ****REMOVED***) GetIndexes(queryer core.Queryer, ctx context.Context, tableName string) (map[string]*schemas.Index, error) {
 	args := []interface{}{tableName}
 	s := fmt.Sprintf("SELECT indexname, indexdef FROM pg_indexes WHERE tablename=$1")
 	if len(db.uri.Schema) != 0 {
@@ -1179,7 +1179,7 @@ func (db ****REMOVED***) GetIndexes(ctx context.Context, tableName string) (map[
 		s = s + " AND schemaname=$2"
 	}
 
-	rows, err := db.DB().QueryContext(ctx, s, args...)
+	rows, err := queryer.QueryContext(ctx, s, args...)
 	if err != nil {
 		return nil, err
 	}

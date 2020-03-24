@@ -506,9 +506,9 @@ type ***REMOVED*** struct {
 	Base
 }
 
-func (db ****REMOVED***) Init(d *core.DB, uri *URI) error {
+func (db ****REMOVED***) Init(uri *URI) error {
 	db.quoter = ***REMOVED***Quoter
-	return db.Base.Init(d, db, uri)
+	return db.Base.Init(db, uri)
 }
 
 func (db ****REMOVED***) SQLType(c *schemas.Column) string {
@@ -611,23 +611,23 @@ func (db ****REMOVED***) IndexCheckSQL(tableName, idxName string) (string, []int
 		`WHERE TABLE_NAME = :1 AND INDEX_NAME = :2`, args
 }
 
-func (db ****REMOVED***) IsTableExist(ctx context.Context, tableName string) (bool, error) {
-	return db.HasRecords(ctx, `SELECT table_name FROM user_tables WHERE table_name = :1`, tableName)
+func (db ****REMOVED***) IsTableExist(queryer core.Queryer, ctx context.Context, tableName string) (bool, error) {
+	return db.HasRecords(queryer, ctx, `SELECT table_name FROM user_tables WHERE table_name = :1`, tableName)
 }
 
-func (db ****REMOVED***) IsColumnExist(ctx context.Context, tableName, colName string) (bool, error) {
+func (db ****REMOVED***) IsColumnExist(queryer core.Queryer, ctx context.Context, tableName, colName string) (bool, error) {
 	args := []interface{}{tableName, colName}
 	query := "SELECT column_name FROM USER_TAB_COLUMNS WHERE table_name = :1" +
 		" AND column_name = :2"
-	return db.HasRecords(ctx, query, args...)
+	return db.HasRecords(queryer, ctx, query, args...)
 }
 
-func (db ****REMOVED***) GetColumns(ctx context.Context, tableName string) ([]string, map[string]*schemas.Column, error) {
+func (db ****REMOVED***) GetColumns(queryer core.Queryer, ctx context.Context, tableName string) ([]string, map[string]*schemas.Column, error) {
 	args := []interface{}{tableName}
 	s := "SELECT column_name,data_default,data_type,data_length,data_precision,data_scale," +
 		"nullable FROM USER_TAB_COLUMNS WHERE table_name = :1"
 
-	rows, err := db.DB().QueryContext(ctx, s, args...)
+	rows, err := queryer.QueryContext(ctx, s, args...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -719,11 +719,11 @@ func (db ****REMOVED***) GetColumns(ctx context.Context, tableName string) ([]st
 	return colSeq, cols, nil
 }
 
-func (db ****REMOVED***) GetTables(ctx context.Context) ([]*schemas.Table, error) {
+func (db ****REMOVED***) GetTables(queryer core.Queryer, ctx context.Context) ([]*schemas.Table, error) {
 	args := []interface{}{}
 	s := "SELECT table_name FROM user_tables"
 
-	rows, err := db.DB().QueryContext(ctx, s, args...)
+	rows, err := queryer.QueryContext(ctx, s, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -742,12 +742,12 @@ func (db ****REMOVED***) GetTables(ctx context.Context) ([]*schemas.Table, error
 	return tables, nil
 }
 
-func (db ****REMOVED***) GetIndexes(ctx context.Context, tableName string) (map[string]*schemas.Index, error) {
+func (db ****REMOVED***) GetIndexes(queryer core.Queryer, ctx context.Context, tableName string) (map[string]*schemas.Index, error) {
 	args := []interface{}{tableName}
 	s := "SELECT t.column_name,i.uniqueness,i.index_name FROM user_ind_columns t,user_indexes i " +
 		"WHERE t.index_name = i.index_name and t.table_name = i.table_name and t.table_name =:1"
 
-	rows, err := db.DB().QueryContext(ctx, s, args...)
+	rows, err := queryer.QueryContext(ctx, s, args...)
 	if err != nil {
 		return nil, err
 	}
