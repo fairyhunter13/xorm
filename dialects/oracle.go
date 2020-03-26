@@ -572,7 +572,8 @@ func (db ****REMOVED***) CreateTableSQL(table *schemas.Table, tableName string) 
 		/*if col.IsPrimaryKey && len(pkList) == 1 {
 			sql += col.String(b.dialect)
 		} else {*/
-		sql += db.StringNoPk(col)
+		s, _ := ColumnString(db, col, false)
+		sql += s
 		// }
 		sql = strings.TrimSpace(sql)
 		sql += ", "
