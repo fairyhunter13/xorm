@@ -270,11 +270,7 @@ func ColumnString(dialect Dialect, col *schemas.Column, includePrimaryKey bool) 
 		}
 	}
 
-	if col.Nullable {
-		if _, err := bd.WriteString("NULL "); err != nil {
-			return "", err
-		}
-	} else {
+	if !col.Nullable {
 		if _, err := bd.WriteString("NOT NULL "); err != nil {
 			return "", err
 		}
