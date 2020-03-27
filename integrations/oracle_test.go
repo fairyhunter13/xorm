@@ -4,7 +4,7 @@
 
 // +build ***REMOVED***
 
-package xorm
+package integrations
 
 import (
 	_ "github.com/mattn/go-oci8"
