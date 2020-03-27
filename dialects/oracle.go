@@ -499,7 +499,11 @@ var (
 		"ZONE":                      true,
 	}
 
-	***REMOVED***Quoter = schemas.Quoter{'[', ']', schemas.AlwaysReserve}
+	***REMOVED***Quoter = schemas.Quoter{
+		Prefix:     '[',
+		Suffix:     ']',
+		IsReserved: schemas.AlwaysReserve,
+	}
 )
 
 type ***REMOVED*** struct {
