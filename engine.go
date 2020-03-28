@@ -542,7 +542,15 @@ func (engine *Engine) dumpTables(tables []*schemas.Table, w io.Writer, tp ...sch
 							temp += fmt.Sprintf(", '%s'", s)
 						}
 					} else {
-						temp += fmt.Sprintf(", %s", s)
+						if dq, ok := d.(bool); ok && dstDialect.URI().DBType == schemas.SQLITE {
+							if dq {
+								temp += ", 1"
+							} else {
+								temp += ", 0"
+							}
+						} else {
+							temp += fmt.Sprintf(", %s", s)
+						}
 					}
 				}
 			}
