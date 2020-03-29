@@ -55,3 +55,14 @@ func OpenDialect(driverName, connstr string) (Dialect, error) {
 
 	return dialect, nil
 }
+
+// OpenDirectly the dialect from the driver mapping to the dialect.
+func OpenDirectly(driverName string) (res Dialect, err error) {
+	res = GetFromProvided(driverName)
+	if res == nil {
+		err = fmt.Errorf("Unsupported dialect type: %v", driverName)
+		return
+	}
+	res.Init(&URI{})
+	return
+}

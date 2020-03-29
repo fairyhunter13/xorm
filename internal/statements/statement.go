@@ -12,14 +12,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fairyhunter13/xorm/contexts"
+	"github.com/fairyhunter13/xorm/convert"
+	"github.com/fairyhunter13/xorm/dialects"
+	"github.com/fairyhunter13/xorm/internal/json"
+	"github.com/fairyhunter13/xorm/internal/utils"
+	"github.com/fairyhunter13/xorm/schemas"
+	"github.com/fairyhunter13/xorm/tags"
 	"xorm.io/builder"
-	"xorm.io/xorm/contexts"
-	"xorm.io/xorm/convert"
-	"xorm.io/xorm/dialects"
-	"xorm.io/xorm/internal/json"
-	"xorm.io/xorm/internal/utils"
-	"xorm.io/xorm/schemas"
-	"xorm.io/xorm/tags"
 )
 
 var (
