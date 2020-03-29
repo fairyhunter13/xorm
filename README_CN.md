@@ -4,8 +4,8 @@
 
 xorm 是一个简单而强大的Go语言ORM库. 通过它可以使数据库操作非常简便。
 
-[![Build Status](https://drone.gitea.com/api/badges/xorm/xorm/status.svg)](https://drone.gitea.com/xorm/xorm) [![](http://gocover.io/_badge/xorm.io/xorm)](https://gocover.io/xorm.io/xorm)
-[![](https://goreportcard.com/badge/xorm.io/xorm)](https://goreportcard.com/report/xorm.io/xorm)
+[![Build Status](https://drone.gitea.com/api/badges/xorm/xorm/status.svg)](https://drone.gitea.com/xorm/xorm) [![](http://gocover.io/_badge/github.com/fairyhunter13/xorm)](https://gocover.io/github.com/fairyhunter13/xorm)
+[![](https://goreportcard.com/badge/github.com/fairyhunter13/xorm)](https://goreportcard.com/report/github.com/fairyhunter13/xorm)
 [![Join the chat at https://img.shields.io/discord/323460943201959939.svg](https://img.shields.io/discord/323460943201959939.svg)](https://discord.gg/HuR2CF3)
 
 ## Notice
@@ -13,7 +13,7 @@ xorm 是一个简单而强大的Go语言ORM库. 通过它可以使数据库操�
 v1.0.0 相对于 v0.8.2 有以下不兼容的变更：
 
 - 移除了部分不符合Go语言命名的函数，如 `Id`, `Sql`，请使用 `ID`, `SQL` 替代。
-- 删除了对 `xorm.io/core` 的依赖。大部分代码迁移到了 `xorm.io/xorm/core`, `xorm.io/xorm/names`, `xorm.io/xorm/schemas` 等等几个包中.
+- 删除了对 `xorm.io/core` 的依赖。大部分代码迁移到了 `github.com/fairyhunter13/xorm/core`, `github.com/fairyhunter13/xorm/names`, `github.com/fairyhunter13/xorm/schemas` 等等几个包中.
 - 重命名了几个结构体，如： `core.IMapper` -> `names.Mapper`, `core.ILogger` -> `log.Logger`.
 
 ## 特性
@@ -54,13 +54,13 @@ v1.0.0 相对于 v0.8.2 有以下不兼容的变更：
 
 ## 安装
 
-	go get xorm.io/xorm
+	go get github.com/fairyhunter13/xorm
 
 ## 文档
 
 * [操作指南](http://xorm.io/docs)
 
-* [Godoc代码文档](http://pkg.go.dev/xorm.io/xorm)
+* [Godoc代码文档](http://pkg.go.dev/github.com/fairyhunter13/xorm)
 
 # 快速开始
 
