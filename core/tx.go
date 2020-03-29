@@ -9,7 +9,7 @@ import (
 	"database/sql"
 	"time"
 
-	"xorm.io/xorm/log"
+	"github.com/fairyhunter13/xorm/log"
 )
 
 var (
