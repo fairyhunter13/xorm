@@ -12,8 +12,8 @@ import (
 	"strconv"
 	"strings"
 
-	"xorm.io/xorm/core"
-	"xorm.io/xorm/schemas"
+	"github.com/fairyhunter13/xorm/core"
+	"github.com/fairyhunter13/xorm/schemas"
 )
 
 var (
@@ -398,7 +398,7 @@ func (db *mssql) GetColumns(queryer core.Queryer, ctx context.Context, tableName
 		  "default_is_null" = (CASE WHEN c.text is null THEN 1 ELSE 0 END),
 	      replace(replace(isnull(c.text,''),'(',''),')','') as vdefault,
 		  ISNULL(p.is_primary_key, 0), a.is_identity as is_identity
-          from sys.columns a 
+          from sys.columns a
 		  left join sys.types b on a.user_type_id=b.user_type_id
           left join sys.syscomments c on a.default_object_id=c.id
 		  LEFT OUTER JOIN (SELECT i.object_id, ic.column_id, i.is_primary_key

@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"xorm.io/xorm/core"
-	"xorm.io/xorm/schemas"
+	"github.com/fairyhunter13/xorm/core"
+	"github.com/fairyhunter13/xorm/schemas"
 )
 
 // URI represents an uri to visit database
@@ -193,12 +193,27 @@ func QueryDialect(dbName schemas.DBType) Dialect {
 	return nil
 }
 
+type dbDriverNDialect struct {
+	dbType     schemas.DBType
+	getDriver  func() Driver
+	getDialect func() Dialect
+}
+
+var (
+	providedDrvsNDialects map[string]dbDriverNDialect
+)
+
+// GetFromProvided gets the dialect directly from the provided/default map.
+func GetFromProvided(driverName string) Dialect {
+	theBundle, ok := providedDrvsNDialects[driverName]
+	if ok {
+		return theBundle.getDialect()
+	}
+	return nil
+}
+
 func regDrvsNDialects() bool {
-	providedDrvsNDialects := map[string]struct {
-		dbType     schemas.DBType
-		getDriver  func() Driver
-		getDialect func() Dialect
-	}{
+	providedDrvsNDialects = map[string]dbDriverNDialect{
 		"mssql":    {"mssql", func() Driver { return &odbcDriver{} }, func() Dialect { return &mssql{} }},
 		"odbc":     {"mssql", func() Driver { return &odbcDriver{} }, func() Dialect { return &mssql{} }}, // !nashtsai! TODO change this when supporting MS Access
 		"mysql":    {"mysql", func() Driver { return &mysqlDriver{} }, func() Dialect { return &mysql{} }},
