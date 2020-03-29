@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"xorm.io/xorm"
-	"xorm.io/xorm/schemas"
+	"github.com/fairyhunter13/xorm"
+	"github.com/fairyhunter13/xorm/schemas"
 
 	_ "github.com/denisenkom/go-mssqldb"
 	_ "github.com/go-sql-driver/mysql"
