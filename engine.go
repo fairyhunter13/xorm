@@ -50,13 +50,33 @@ type Engine struct {
 
 // NewEngine new a db manager according to the parameter. Currently support four
 // drivers
-func NewEngine(driverName string, dataSourceName string) (*Engine, error) {
-	dialect, err := dialects.OpenDialect(driverName, dataSourceName)
-	if err != nil {
-		return nil, err
+func NewEngine(driverName string, source interface{}) (*Engine, error) {
+	var (
+		dsn     string
+		dialect dialects.Dialect
+		err     error
+	)
+	switch valSource := source.(type) {
+	case string, *string:
+		if newValSource, ok := valSource.(*string); ok && newValSource != nil {
+			dsn = *newValSource
+		} else {
+			dsn, _ = valSource.(string)
+		}
+		dialect, err = dialects.OpenDialect(driverName, dsn)
+		if err != nil {
+			return nil, err
+		}
+		source = dsn
+
+	case *sql.DB:
+		dialect, err = dialects.OpenDirectly(driverName)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	db, err := core.Open(driverName, dataSourceName)
+	db, err := core.Open(driverName, source)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +92,7 @@ func NewEngine(driverName string, dataSourceName string) (*Engine, error) {
 		cacherMgr:      cacherMgr,
 		tagParser:      tagParser,
 		driverName:     driverName,
-		dataSourceName: dataSourceName,
+		dataSourceName: dsn,
 		db:             db,
 		logSessionID:   false,
 	}
@@ -272,6 +292,9 @@ func (engine *Engine) MapCacher(bean interface{}, cacher caches.Cacher) error {
 
 // NewDB provides an interface to operate database directly
 func (engine *Engine) NewDB() (*core.DB, error) {
+	if engine.DataSourceName() == "" {
+		return engine.DB(), nil
+	}
 	return core.Open(engine.driverName, engine.dataSourceName)
 }
 
