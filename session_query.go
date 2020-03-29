@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"time"
 
-	"xorm.io/xorm/core"
-	"xorm.io/xorm/schemas"
+	"github.com/fairyhunter13/xorm/core"
+	"github.com/fairyhunter13/xorm/schemas"
 )
 
 // Query runs a raw sql and return records as []map[string][]byte
