@@ -8,6 +8,7 @@ import (
 	"context"
 	"database/sql"
 	"database/sql/driver"
+	"errors"
 	"fmt"
 	"reflect"
 	"regexp"
@@ -90,11 +91,33 @@ type DB struct {
 	Logger            log.ContextLogger
 }
 
+var (
+	// ErrInvalidTypeOfSource indicates that the source passed to the NewEngine function
+	// is invalid.
+	ErrInvalidTypeOfSource = errors.New("Source type of the engine must be valid string, *string, or *sql.DB")
+	// ErrSourceMusntBeEmpty indicates that the passed data source is either empty or nil.
+	ErrSourceMusntBeEmpty = errors.New("The source musn't be empty or nil")
+)
+
 // Open opens a database
-func Open(driverName, dataSourceName string) (*DB, error) {
-	db, err := sql.Open(driverName, dataSourceName)
-	if err != nil {
-		return nil, err
+func Open(driverName string, dataSourceName interface{}) (*DB, error) {
+	var (
+		db  *sql.DB
+		err error
+	)
+	switch dsn := dataSourceName.(type) {
+	case string:
+		db, err = sql.Open(driverName, dsn)
+		if err != nil {
+			return nil, err
+		}
+	case *sql.DB:
+		if dsn == nil {
+			return nil, ErrSourceMusntBeEmpty
+		}
+		db = dsn
+	default:
+		return nil, ErrInvalidTypeOfSource
 	}
 	return &DB{
 		DB:           db,
