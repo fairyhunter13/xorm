@@ -10,12 +10,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fairyhunter13/xorm"
+	"github.com/fairyhunter13/xorm/internal/statements"
+	"github.com/fairyhunter13/xorm/internal/utils"
+	"github.com/fairyhunter13/xorm/names"
+	"github.com/fairyhunter13/xorm/schemas"
 	"github.com/stretchr/testify/assert"
-	"xorm.io/xorm"
-	"xorm.io/xorm/internal/statements"
-	"xorm.io/xorm/internal/utils"
-	"xorm.io/xorm/names"
-	"xorm.io/xorm/schemas"
 )
 
 func TestUpdateMap(t *testing.T) {
