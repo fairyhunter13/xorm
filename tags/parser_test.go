@@ -8,10 +8,10 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/fairyhunter13/xorm/caches"
+	"github.com/fairyhunter13/xorm/dialects"
+	"github.com/fairyhunter13/xorm/names"
 	"github.com/stretchr/testify/assert"
-	"xorm.io/xorm/caches"
-	"xorm.io/xorm/dialects"
-	"xorm.io/xorm/names"
 )
 
 type ParseTableName1 struct{}
