@@ -21,9 +21,9 @@ func (session *Session) Reset() {
 	session.prepareStmt = false
 	session.autoResetStatement = false
 
-	session.afterInsertBeans = make(map[interface{}]*[]func(interface{}), 0)
-	session.afterUpdateBeans = make(map[interface{}]*[]func(interface{}), 0)
-	session.afterDeleteBeans = make(map[interface{}]*[]func(interface{}), 0)
+	session.afterInsertBeans = nil
+	session.afterUpdateBeans = nil
+	session.afterDeleteBeans = nil
 
 	session.beforeClosures = session.beforeClosures[:0]
 	session.afterClosures = session.afterClosures[:0]
