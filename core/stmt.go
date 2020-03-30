@@ -103,7 +103,7 @@ func (s *Stmt) ExecContext(ctx context.Context, args ...interface{}) (sql.Result
 			Args: args,
 		})
 	}
-	res, err := s.Stmt.ExecContext(ctx, args)
+	res, err := s.Stmt.ExecContext(ctx, args...)
 	if showSQL {
 		s.db.Logger.AfterSQL(log.LogContext{
 			Ctx:         ctx,
