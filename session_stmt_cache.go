@@ -1,7 +1,7 @@
 package xorm
 
 import (
-	"regexp"
+	"strings"
 	"sync"
 
 	"github.com/cespare/xxhash"
@@ -9,13 +9,12 @@ import (
 )
 
 var (
-	stmtCache                = make(map[uint64]*core.Stmt, 0) //key: xxhash of sqlstring+len(sqlstring)
-	mutex                    = new(sync.RWMutex)
-	regexWhiteSpaceCharacter = regexp.MustCompile(`[\s]`)
+	stmtCache = make(map[uint64]*core.Stmt, 0) //key: xxhash of sanitized sqlstring
+	mutex     = new(sync.RWMutex)
 )
 
 func getKey(sqlStr string) string {
-	return regexWhiteSpaceCharacter.ReplaceAllString(sqlStr, "")
+	return strings.Join(strings.Fields(sqlStr), "")
 }
 
 func (session *Session) doPrepare(db *core.DB, sqlStr string) (stmt *core.Stmt, err error) {
