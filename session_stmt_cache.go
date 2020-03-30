@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	stmtCache                map[uint64]*core.Stmt //key: xxhash of sqlstring+len(sqlstring)
+	stmtCache                = make(map[uint64]*core.Stmt, 0) //key: xxhash of sqlstring+len(sqlstring)
 	mutex                    = new(sync.RWMutex)
 	regexWhiteSpaceCharacter = regexp.MustCompile(`[\s]`)
 )
