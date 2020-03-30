@@ -86,10 +86,15 @@ func (s *Stmt) ExecContext(ctx context.Context, args ...interface{}) (sql.Result
 	if err != nil {
 		return nil, err
 	}
-	res, err := s.Stmt.ExecContext(ctx, args)
-	hookCtx.End(ctx, res, err)
-	if err := s.db.afterProcess(hookCtx); err != nil {
-		return nil, err
+	res, err := s.Stmt.ExecContext(ctx, args...)
+	if showSQL {
+		s.db.Logger.AfterSQL(log.LogContext{
+			Ctx:         ctx,
+			SQL:         s.query,
+			Args:        args,
+			ExecuteTime: time.Now().Sub(start),
+			Err:         err,
+		})
 	}
 	return res, nil
 }
