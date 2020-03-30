@@ -12,7 +12,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"hash/crc32"
 	"io"
 	"reflect"
 	"strings"
@@ -79,8 +78,6 @@ type Session struct {
 	afterClosures   []func(interface{})
 	afterProcessors []executedProcessor
 
-	stmtCache map[uint32]*core.Stmt //key: hash.Hash32 of (queryStr, len(queryStr))
-
 	lastSQL     string
 	lastSQLArgs []interface{}
 
@@ -100,56 +97,54 @@ func newSessionID() string {
 }
 
 func newSession(engine *Engine) *Session {
+	session, valid := sessionPool.Get().(*Session)
+	if !valid {
+		session = new(Session)
+	}
+	session.Reset()
+
 	var ctx context.Context
 	if engine.logSessionID {
-		ctx = context.WithValue(engine.defaultContext, log.SessionIDKey,  newSessionID())
+		ctx = context.WithValue(engine.defaultContext, log.SessionIDKey, newSessionID())
 	} else {
 		ctx = engine.defaultContext
 	}
 
-	session := &Session{
-		ctx:    ctx,
-		engine: engine,
-		tx:     nil,
-		statement: statements.NewStatement(
-			engine.dialect,
-			engine.tagParser,
-			engine.DatabaseTZ,
-		),
-		isClosed:               false,
-		isAutoCommit:           true,
-		isCommitedOrRollbacked: false,
-		isAutoClose:            false,
-		autoResetStatement:     true,
-		prepareStmt:            false,
+	session.engine = engine
+	session.tx = nil
+	session.statement = statements.NewStatement(
+		engine.dialect,
+		engine.tagParser,
+		engine.DatabaseTZ,
+	)
 
-		afterInsertBeans: make(map[interface{}]*[]func(interface{}), 0),
-		afterUpdateBeans: make(map[interface{}]*[]func(interface{}), 0),
-		afterDeleteBeans: make(map[interface{}]*[]func(interface{}), 0),
-		beforeClosures:   make([]func(interface{}), 0),
-		afterClosures:    make([]func(interface{}), 0),
-		afterProcessors:  make([]executedProcessor, 0),
-		stmtCache:        make(map[uint32]*core.Stmt),
+	session.isAutoCommit = true
+	session.isCommitedOrRollbacked = false
+	session.isAutoClose = false
+	session.isClosed = false
+	session.prepareStmt = false
+	session.autoResetStatement = true
 
-		lastSQL:     "",
-		lastSQLArgs: make([]interface{}, 0),
+	session.afterInsertBeans = make(map[interface{}]*[]func(interface{}), 0)
+	session.afterUpdateBeans = make(map[interface{}]*[]func(interface{}), 0)
+	session.afterDeleteBeans = make(map[interface{}]*[]func(interface{}), 0)
 
-		sessionType: engineSession,
-	}
-	if engine.logSessionID {
-		session.ctx = context.WithValue(session.ctx, log.SessionKey, session)
-	}
+	session.beforeClosures = session.beforeClosures[:0]
+	session.afterClosures = session.afterClosures[:0]
+	session.afterProcessors = session.afterProcessors[:0]
+
+	session.lastSQL = session.lastSQL[:0]
+	session.lastSQLArgs = session.lastSQLArgs[:0]
+
+	session.ctx = ctx
+	session.sessionType = engineSession
+
 	return session
 }
 
 // Close release the connection from pool
 func (session *Session) Close() error {
-	for _, v := range session.stmtCache {
-		if err := v.Close(); err != nil {
-			return err
-		}
-	}
-
+	defer sessionPool.Put(session)
 	if !session.isClosed {
 		// When Close be called, if session is a transaction and do not call
 		// Commit or Rollback, then call Rollback.
@@ -159,7 +154,6 @@ func (session *Session) Close() error {
 			}
 		}
 		session.tx = nil
-		session.stmtCache = nil
 		session.isClosed = true
 	}
 	return nil
@@ -347,21 +341,6 @@ func (session *Session) canCache() bool {
 		return false
 	}
 	return true
-}
-
-func (session *Session) doPrepare(db *core.DB, sqlStr string) (stmt *core.Stmt, err error) {
-	crc := crc32.ChecksumIEEE([]byte(sqlStr))
-	// TODO try hash(sqlStr+len(sqlStr))
-	var has bool
-	stmt, has = session.stmtCache[crc]
-	if !has {
-		stmt, err = db.PrepareContext(session.ctx, sqlStr)
-		if err != nil {
-			return nil, err
-		}
-		session.stmtCache[crc] = stmt
-	}
-	return
 }
 
 func (session *Session) getField(dataStruct *reflect.Value, key string, table *schemas.Table, idx int) (*reflect.Value, error) {
