@@ -13,7 +13,7 @@ import (
 	"io"
 )
 
-// md5 hash string
+// Md5 hash string
 func Md5(str string) string {
 	m := md5.New()
 	io.WriteString(m, str)
