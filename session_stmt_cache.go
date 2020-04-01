@@ -1,11 +1,11 @@
 package xorm
 
 import (
-	"strings"
 	"sync"
 
 	"github.com/cespare/xxhash"
 	"github.com/fairyhunter13/xorm/core"
+	"github.com/fairyhunter13/xorm/lexer/hashkey"
 )
 
 var (
@@ -13,12 +13,8 @@ var (
 	mutex     = new(sync.RWMutex)
 )
 
-func getKey(sqlStr string) string {
-	return strings.Join(strings.Fields(sqlStr), "")
-}
-
 func (session *Session) doPrepare(db *core.DB, sqlStr string) (stmt *core.Stmt, err error) {
-	xxh := xxhash.Sum64String(getKey(sqlStr))
+	xxh := xxhash.Sum64String(hashkey.Get(sqlStr))
 	var has bool
 	mutex.RLock()
 	stmt, has = stmtCache[xxh]
