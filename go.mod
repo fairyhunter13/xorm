@@ -3,7 +3,9 @@ module github.com/fairyhunter13/xorm
 go 1.14
 
 require (
+	github.com/bbuck/go-lexer v0.0.0-20150530081543-8752f4c00663
 	github.com/cespare/xxhash v1.1.0
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20200206145737-bbfc9a55622e
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/kr/pretty v0.1.0 // indirect
