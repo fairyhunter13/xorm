@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	stmtCache = make(map[uint64]*core.Stmt, 0) //key: xxhash of sanitized sqlstring
+	stmtCache = make(map[uint64]map[*core.DB]*core.Stmt, 0)
 	mutex     = new(sync.RWMutex)
 )
 
@@ -17,7 +17,7 @@ func (session *Session) doPrepare(db *core.DB, sqlStr string) (stmt *core.Stmt, 
 	xxh := xxhash.Sum64String(hashkey.Get(sqlStr))
 	var has bool
 	mutex.RLock()
-	stmt, has = stmtCache[xxh]
+	stmt, has = stmtCache[xxh][db]
 	mutex.RUnlock()
 	if !has {
 		stmt, err = db.PrepareContext(session.ctx, sqlStr)
@@ -25,7 +25,7 @@ func (session *Session) doPrepare(db *core.DB, sqlStr string) (stmt *core.Stmt, 
 			return nil, err
 		}
 		mutex.Lock()
-		stmtCache[xxh] = stmt
+		stmtCache[xxh][db] = stmt
 		mutex.Unlock()
 	}
 	return
