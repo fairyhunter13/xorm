@@ -132,3 +132,8 @@ func (col *Column) ConvertID(sid string) (interface{}, error) {
 	}
 	return nil, errors.New("not supported")
 }
+
+// IsAutoIncrOrDefaultExist check if the auto increment is set or the default exist in the current column.
+func (col *Column) IsAutoIncrOrDefaultExist() bool {
+	return col.IsAutoIncrement || !col.DefaultIsEmpty
+}

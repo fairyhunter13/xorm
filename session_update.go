@@ -484,7 +484,7 @@ func (session *Session) genUpdateColumns(bean interface{}) ([]string, []interfac
 		}
 		fieldValue := *fieldValuePtr
 
-		if col.IsAutoIncrement && utils.IsValueZero(fieldValue) {
+		if col.IsAutoIncrOrDefaultExist() && utils.IsValueZero(fieldValue) {
 			continue
 		}
 
