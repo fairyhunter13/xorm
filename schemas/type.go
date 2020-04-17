@@ -68,6 +68,7 @@ func (s *SQLType) IsJson() bool {
 	return s.Name == Json || s.Name == Jsonb
 }
 
+// List of all types keyword
 var (
 	Bit       = "BIT"
 	TinyInt   = "TINYINT"
@@ -76,6 +77,15 @@ var (
 	Int       = "INT"
 	Integer   = "INTEGER"
 	BigInt    = "BIGINT"
+
+	// Especially for mysql unsigned
+	UnsignedBit       = "BIT UNSIGNED"
+	UnsignedTinyInt   = "TINYINT UNSIGNED"
+	UnsignedSmallInt  = "SMALLINT UNSIGNED"
+	UnsignedMediumInt = "MEDIUMINT UNSIGNED"
+	UnsignedInt       = "INT UNSIGNED"
+	UnsignedInteger   = "INTEGER UNSIGNED"
+	UnsignedBigInt    = "BIGINT UNSIGNED"
 
 	Enum = "ENUM"
 	Set  = "SET"
@@ -125,12 +135,25 @@ var (
 	Serial    = "SERIAL"
 	BigSerial = "BIGSERIAL"
 
+	// Especially for mysql unsigned
+	UnsignedSerial    = "SERIAL UNSIGNED"
+	UnsignedBigSerial = "BIGSERIAL UNSIGNED"
+
 	Json  = "JSON"
 	Jsonb = "JSONB"
 
 	Array = "ARRAY"
 
 	SqlTypes = map[string]int{
+		// Especially for mysql types
+		UnsignedBit:       NUMERIC_TYPE,
+		UnsignedTinyInt:   NUMERIC_TYPE,
+		UnsignedSmallInt:  NUMERIC_TYPE,
+		UnsignedMediumInt: NUMERIC_TYPE,
+		UnsignedInt:       NUMERIC_TYPE,
+		UnsignedInteger:   NUMERIC_TYPE,
+		UnsignedBigInt:    NUMERIC_TYPE,
+
 		Bit:       NUMERIC_TYPE,
 		TinyInt:   NUMERIC_TYPE,
 		SmallInt:  NUMERIC_TYPE,
@@ -187,6 +210,9 @@ var (
 
 		Serial:    NUMERIC_TYPE,
 		BigSerial: NUMERIC_TYPE,
+
+		UnsignedSerial:    NUMERIC_TYPE,
+		UnsignedBigSerial: NUMERIC_TYPE,
 
 		Array: ARRAY_TYPE,
 	}
@@ -314,8 +340,12 @@ func SQLType2Type(st SQLType) reflect.Type {
 	switch name {
 	case Bit, TinyInt, SmallInt, MediumInt, Int, Integer, Serial:
 		return reflect.TypeOf(1)
+	case UnsignedBit, UnsignedTinyInt, UnsignedSmallInt, UnsignedMediumInt, UnsignedInt, UnsignedInteger, UnsignedSerial:
+		return reflect.TypeOf(uint(1))
 	case BigInt, BigSerial:
 		return reflect.TypeOf(int64(1))
+	case UnsignedBigInt, UnsignedBigSerial:
+		return reflect.TypeOf(uint64(1))
 	case Float, Real:
 		return reflect.TypeOf(float32(1))
 	case Double:
