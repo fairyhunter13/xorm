@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/fairyhunter13/xorm/core"
+	lexermysql "github.com/fairyhunter13/xorm/lexer/mysql"
 	"github.com/fairyhunter13/xorm/schemas"
 )
 
@@ -343,8 +344,8 @@ func (db *mysql) GetColumns(queryer core.Queryer, ctx context.Context, tableName
 		}
 
 		cts := strings.Split(colType, "(")
-		colName := cts[0]
-		colType = strings.ToUpper(colName)
+		colName := strings.TrimSpace(colType)
+		colType = strings.ToUpper((lexermysql.GetType(colName)))
 		var len1, len2 int
 		if len(cts) == 2 {
 			idx := strings.Index(cts[1], ")")
@@ -391,6 +392,7 @@ func (db *mysql) GetColumns(queryer core.Queryer, ctx context.Context, tableName
 		} else {
 			return nil, nil, fmt.Errorf("Unknown colType %v", colType)
 		}
+		col.SQLType = db.convertType(col.SQLType)
 
 		if colKey == "PRI" {
 			col.IsPrimaryKey = true
@@ -414,6 +416,17 @@ func (db *mysql) GetColumns(queryer core.Queryer, ctx context.Context, tableName
 		colSeq = append(colSeq, col.Name)
 	}
 	return colSeq, cols, nil
+}
+
+func (db *mysql) convertType(origin schemas.SQLType) (converted schemas.SQLType) {
+	converted = origin
+	switch origin.Name {
+	case schemas.TinyInt, schemas.UnsignedTinyInt:
+		if origin.DefaultLength == 1 {
+			converted.Name = schemas.Bool
+		}
+	}
+	return
 }
 
 func (db *mysql) GetTables(queryer core.Queryer, ctx context.Context) ([]*schemas.Table, error) {
