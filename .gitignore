@@ -36,3 +36,4 @@ test.db.sql
 *coverage.out
 test.db
 integrations/*.sql
+codealike.json
