@@ -149,7 +149,7 @@ func (session *Session) innerInsertMulti(rowsSlicePtr interface{}) (int64, error
 				return 0, err
 			}
 			fieldValue := *ptrFieldValue
-			if col.IsAutoIncrement && utils.IsZero(fieldValue.Interface()) {
+			if col.IsAutoIncrOrDefaultExist() && utils.IsZero(fieldValue.Interface()) {
 				continue
 			}
 			if col.MapType == schemas.ONLYFROMDB {
@@ -524,7 +524,7 @@ func (session *Session) genInsertColumns(bean interface{}) ([]string, []interfac
 		}
 		fieldValue := *fieldValuePtr
 
-		if col.IsAutoIncrement && utils.IsValueZero(fieldValue) {
+		if col.IsAutoIncrOrDefaultExist() && utils.IsValueZero(fieldValue) {
 			continue
 		}
 
