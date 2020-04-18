@@ -392,6 +392,7 @@ func (db *mysql) GetColumns(queryer core.Queryer, ctx context.Context, tableName
 		} else {
 			return nil, nil, fmt.Errorf("Unknown colType %v", colType)
 		}
+		col.SQLType = db.convertType(col.SQLType)
 
 		if colKey == "PRI" {
 			col.IsPrimaryKey = true
@@ -415,6 +416,17 @@ func (db *mysql) GetColumns(queryer core.Queryer, ctx context.Context, tableName
 		colSeq = append(colSeq, col.Name)
 	}
 	return colSeq, cols, nil
+}
+
+func (db *mysql) convertType(origin schemas.SQLType) (converted schemas.SQLType) {
+	converted = origin
+	switch origin.Name {
+	case schemas.TinyInt, schemas.UnsignedTinyInt:
+		if origin.DefaultLength == 1 {
+			converted.Name = schemas.Bool
+		}
+	}
+	return
 }
 
 func (db *mysql) GetTables(queryer core.Queryer, ctx context.Context) ([]*schemas.Table, error) {
