@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"strings"
 	"unicode"
 
 	"github.com/bbuck/go-lexer"
@@ -84,14 +85,18 @@ func GetType(typeStr string) (res string) {
 
 	lex := lexer.New(typeStr, getType)
 	lex.Start()
+LOOP:
 	for {
 		token, ok := lex.NextToken()
 		if ok {
-			break
+			break LOOP
 		}
 		switch token.Type {
 		case UsualToken:
 			builder.WriteString(token.Value)
+			if strings.EqualFold(token.Value, "unsigned") {
+				break LOOP
+			}
 		case WhitespaceToken:
 			builder.WriteString(" ")
 		}
