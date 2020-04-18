@@ -366,8 +366,8 @@ func SQLType2Type(st SQLType) reflect.Type {
 }
 
 // OriginalTypeName convert the unsigned cases of type name to the natural name.
-func OriginalTypeName(name string) (result string) {
-	switch name {
+func OriginalTypeName(sqlType SQLType) (result string) {
+	switch sqlType.Name {
 	case UnsignedBit:
 		result = Bit
 	case UnsignedTinyInt:
@@ -386,8 +386,12 @@ func OriginalTypeName(name string) (result string) {
 		result = Serial
 	case UnsignedBigSerial:
 		result = BigSerial
+	case Bool:
+		if sqlType.DefaultLength == 1 {
+			result = TinyInt
+		}
 	default:
-		result = name
+		result = sqlType.Name
 	}
 	return
 }
