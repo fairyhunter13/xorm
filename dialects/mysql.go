@@ -342,7 +342,7 @@ func (db *mysql) GetColumns(queryer core.Queryer, ctx context.Context, tableName
 		}
 
 		cts := strings.Split(colType, "(")
-		colName := cts[0]
+		// TODO: modify this
 		colType = strings.ToUpper(colName)
 		var len1, len2 int
 		if len(cts) == 2 {
