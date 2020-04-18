@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/fairyhunter13/xorm/core"
+	lexermysql "github.com/fairyhunter13/xorm/lexer/mysql"
 	"github.com/fairyhunter13/xorm/schemas"
 )
 
@@ -343,8 +344,7 @@ func (db *mysql) GetColumns(queryer core.Queryer, ctx context.Context, tableName
 		}
 
 		cts := strings.Split(colType, "(")
-		// TODO: modify this
-		colType = strings.ToUpper(colName)
+		colType = strings.ToUpper(strings.TrimSpace(lexermysql.GetType(colType)))
 		var len1, len2 int
 		if len(cts) == 2 {
 			idx := strings.Index(cts[1], ")")
