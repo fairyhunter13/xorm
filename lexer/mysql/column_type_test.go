@@ -54,11 +54,25 @@ func TestGetType(t *testing.T) {
 			wantRes: "BIGSERIAL",
 		},
 		{
-			name: "Mysql type bigserial(21) unsigned uppercase",
+			name: "Mysql type bigserial(21) unsigned",
 			args: args{
 				typeStr: "bigserial(21) unsigned",
 			},
 			wantRes: "bigserial unsigned",
+		},
+		{
+			name: "Mysql type bigserial(21) unsigned zerofill",
+			args: args{
+				typeStr: "bigserial(21) unsigned zerofill",
+			},
+			wantRes: "bigserial unsigned",
+		},
+		{
+			name: "Mysql type bigserial(21) unsigned zerofill uppercase",
+			args: args{
+				typeStr: "BIGSERIAL(21) UNSIGNED ZEROFILL",
+			},
+			wantRes: "BIGSERIAL UNSIGNED",
 		},
 	}
 	for _, tt := range tests {
