@@ -115,3 +115,8 @@ func (col *Column) ValueOfV(dataStruct *reflect.Value) (*reflect.Value, error) {
 
 	return &fieldValue, nil
 }
+
+// IsAutoIncrOrDefaultExist check if the auto increment is set or the default exist in the current column.
+func (col *Column) IsAutoIncrOrDefaultExist() bool {
+	return col.IsAutoIncrement || !col.DefaultIsEmpty
+}
