@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/bbuck/go-lexer v0.0.0-20150530081543-8752f4c00663
 	github.com/cespare/xxhash v1.1.0
-	github.com/denisenkom/go-mssqldb v0.0.0-20200428022330-06a60b6afbbc
+	github.com/denisenkom/go-mssqldb v0.0.0-20200620013148-b91950f658ec
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/kr/pretty v0.2.1 // indirect
 	github.com/lib/pq v1.7.0
