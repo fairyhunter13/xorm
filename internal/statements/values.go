@@ -15,6 +15,7 @@ import (
 	"github.com/fairyhunter13/xorm/dialects"
 	"github.com/fairyhunter13/xorm/internal/json"
 	"github.com/fairyhunter13/xorm/schemas"
+	"github.com/fairyhunter13/xorm/zero"
 )
 
 var (
@@ -25,6 +26,9 @@ var (
 func (statement *Statement) Value2Interface(col *schemas.Column, fieldValue reflect.Value) (interface{}, error) {
 	if fieldValue.CanAddr() {
 		if fieldConvert, ok := fieldValue.Addr().Interface().(convert.Conversion); ok {
+			if zero.IsNil(fieldConvert) {
+				return nil, nil
+			}
 			data, err := fieldConvert.ToDB()
 			if err != nil {
 				return nil, err
@@ -37,6 +41,9 @@ func (statement *Statement) Value2Interface(col *schemas.Column, fieldValue refl
 	}
 
 	if fieldConvert, ok := fieldValue.Interface().(convert.Conversion); ok {
+		if zero.IsNil(fieldConvert) {
+			return nil, nil
+		}
 		data, err := fieldConvert.ToDB()
 		if err != nil {
 			return nil, err
