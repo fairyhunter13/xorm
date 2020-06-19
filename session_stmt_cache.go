@@ -1,9 +1,9 @@
 package xorm
 
 import (
+	"hash/crc64"
 	"sync"
 
-	"github.com/cespare/xxhash"
 	"github.com/fairyhunter13/xorm/core"
 	"github.com/fairyhunter13/xorm/lexer/hashkey"
 )
@@ -56,10 +56,11 @@ func (sc *StatementCache) Set(key uint64, db *core.DB, stmt *core.Stmt) {
 
 var (
 	stmtCache = newStatementCache()
+	isoTable  = crc64.MakeTable(crc64.ISO)
 )
 
 func (session *Session) doPrepare(db *core.DB, sqlStr string) (stmt *core.Stmt, err error) {
-	xxh := xxhash.Sum64String(hashkey.Get(sqlStr))
+	xxh := crc64.Checksum([]byte(hashkey.Get(sqlStr)), isoTable)
 	var has bool
 	stmt, has = stmtCache.Get(xxh, db)
 	if !has {
