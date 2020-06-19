@@ -16,11 +16,6 @@ import (
 	"xorm.io/builder"
 )
 
-const (
-	tpStruct = iota
-	tpNonStruct
-)
-
 // Find retrieve records from table, condiBeans's non-empty fields
 // are conditions. beans could be []Struct, []*Struct, map[int64]Struct
 // map[int64]*Struct
@@ -74,7 +69,7 @@ func (session *Session) FindAndCount(rowsSlicePtr interface{}, condiBean ...inte
 	return session.Unscoped().Count(reflect.New(sliceElementType).Interface())
 }
 
-func (session *Session) find(rowsSlicePtr interface{}, condiBean ...interface{}) error {
+func (session *Session) find(rowsSlicePtr interface{}, condiBeans ...interface{}) error {
 	defer session.resetStatement()
 	if session.statement.LastError != nil {
 		return session.statement.LastError
@@ -89,7 +84,6 @@ func (session *Session) find(rowsSlicePtr interface{}, condiBean ...interface{})
 
 	sliceElementType := sliceValue.Type().Elem()
 
-	var tp = tpStruct
 	if session.statement.RefTable == nil {
 		if sliceElementType.Kind() == reflect.Ptr {
 			if sliceElementType.Elem().Kind() == reflect.Struct {
@@ -97,16 +91,12 @@ func (session *Session) find(rowsSlicePtr interface{}, condiBean ...interface{})
 				if err := session.statement.SetRefValue(pv); err != nil {
 					return err
 				}
-			} else {
-				tp = tpNonStruct
 			}
 		} else if sliceElementType.Kind() == reflect.Struct {
 			pv := reflect.New(sliceElementType)
 			if err := session.statement.SetRefValue(pv); err != nil {
 				return err
 			}
-		} else {
-			tp = tpNonStruct
 		}
 	}
 
@@ -115,17 +105,25 @@ func (session *Session) find(rowsSlicePtr interface{}, condiBean ...interface{})
 		addedTableName = (len(session.statement.JoinStr) > 0)
 		autoCond       builder.Cond
 	)
-	if tp == tpStruct {
-		if !session.statement.NoAutoCondition && len(condiBean) > 0 {
-			condTable, err := session.engine.tagParser.Parse(reflect.ValueOf(condiBean[0]))
+
+	if !session.statement.NoAutoCondition && len(condiBeans) > 0 {
+		for _, condiBean := range condiBeans {
+			condTable, err := session.engine.tagParser.Parse(reflect.ValueOf(condiBean))
 			if err != nil {
 				return err
 			}
-			autoCond, err = session.statement.BuildConds(condTable, condiBean[0], true, true, false, true, addedTableName)
+			tempCond, err := session.statement.BuildConds(condTable, condiBean, true, true, false, true, addedTableName)
 			if err != nil {
 				return err
 			}
-		} else {
+			if autoCond == nil {
+				autoCond = tempCond
+			} else {
+				autoCond.And(tempCond)
+			}
+		}
+	} else {
+		if table != nil {
 			if col := table.DeletedColumn(); col != nil && !session.statement.GetUnscoped() { // tag "deleted" is enabled
 				autoCond = session.statement.CondDeleted(col)
 			}
