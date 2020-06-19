@@ -97,12 +97,6 @@ func newSessionID() string {
 }
 
 func newSession(engine *Engine) *Session {
-	session, valid := sessionPool.Get().(*Session)
-	if !valid {
-		session = new(Session)
-	}
-	session.Reset()
-
 	var ctx context.Context
 	if engine.logSessionID {
 		ctx = context.WithValue(engine.defaultContext, log.SessionIDKey, newSessionID())
@@ -110,41 +104,40 @@ func newSession(engine *Engine) *Session {
 		ctx = engine.defaultContext
 	}
 
-	session.engine = engine
-	session.tx = nil
-	session.statement = statements.NewStatement(
-		engine.dialect,
-		engine.tagParser,
-		engine.DatabaseTZ,
-	)
+	return &Session{
+		engine: engine,
+		tx:     nil,
+		statement: statements.NewStatement(
+			engine.dialect,
+			engine.tagParser,
+			engine.DatabaseTZ,
+		),
 
-	session.isAutoCommit = true
-	session.isCommitedOrRollbacked = false
-	session.isAutoClose = false
-	session.isClosed = false
-	session.prepareStmt = false
-	session.autoResetStatement = true
+		isAutoCommit:           true,
+		isCommitedOrRollbacked: false,
+		isAutoClose:            false,
+		isClosed:               false,
+		prepareStmt:            false,
+		autoResetStatement:     true,
 
-	session.afterInsertBeans = make(map[interface{}]*[]func(interface{}), 0)
-	session.afterUpdateBeans = make(map[interface{}]*[]func(interface{}), 0)
-	session.afterDeleteBeans = make(map[interface{}]*[]func(interface{}), 0)
+		afterInsertBeans: make(map[interface{}]*[]func(interface{}), 0),
+		afterUpdateBeans: make(map[interface{}]*[]func(interface{}), 0),
+		afterDeleteBeans: make(map[interface{}]*[]func(interface{}), 0),
 
-	session.beforeClosures = session.beforeClosures[:0]
-	session.afterClosures = session.afterClosures[:0]
-	session.afterProcessors = session.afterProcessors[:0]
+		beforeClosures:  make([]func(interface{}), 0),
+		afterClosures:   make([]func(interface{}), 0),
+		afterProcessors: make([]executedProcessor, 0),
 
-	session.lastSQL = session.lastSQL[:0]
-	session.lastSQLArgs = session.lastSQLArgs[:0]
+		lastSQL:     "",
+		lastSQLArgs: make([]interface{}, 0),
 
-	session.ctx = ctx
-	session.sessionType = engineSession
-
-	return session
+		ctx:         ctx,
+		sessionType: engineSession,
+	}
 }
 
 // Close release the connection from pool
 func (session *Session) Close() error {
-	defer sessionPool.Put(session)
 	if !session.isClosed {
 		// When Close be called, if session is a transaction and do not call
 		// Commit or Rollback, then call Rollback.
