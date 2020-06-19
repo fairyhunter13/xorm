@@ -22,6 +22,7 @@ func (session *Session) Begin() error {
 		session.tx = tx
 
 		session.saveLastSQL("BEGIN TRANSACTION")
+		session.isAutoClose = false
 	}
 	return nil
 }
