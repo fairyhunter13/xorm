@@ -15,6 +15,7 @@ import (
 	"io"
 	"reflect"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/fairyhunter13/xorm/contexts"
@@ -96,12 +97,14 @@ func newSessionID() string {
 	return mdStr[0:20]
 }
 
+var sessionPool = &sync.Pool{
+	New: func() interface{} {
+		return new(Session)
+	},
+}
+
 func newSession(engine *Engine) *Session {
-	session, valid := sessionPool.Get().(*Session)
-	if !valid {
-		session = new(Session)
-	}
-	session.Reset()
+	session := sessionPool.Get().(*Session)
 
 	var ctx context.Context
 	if engine.logSessionID {
@@ -129,12 +132,12 @@ func newSession(engine *Engine) *Session {
 	session.afterUpdateBeans = make(map[interface{}]*[]func(interface{}), 0)
 	session.afterDeleteBeans = make(map[interface{}]*[]func(interface{}), 0)
 
-	session.beforeClosures = session.beforeClosures[:0]
-	session.afterClosures = session.afterClosures[:0]
-	session.afterProcessors = session.afterProcessors[:0]
+	session.beforeClosures = make([]func(interface{}), 0)
+	session.afterClosures = make([]func(interface{}), 0)
+	session.afterProcessors = make([]executedProcessor, 0)
 
-	session.lastSQL = session.lastSQL[:0]
-	session.lastSQLArgs = session.lastSQLArgs[:0]
+	session.lastSQL = ""
+	session.lastSQLArgs = make([]interface{}, 0)
 
 	session.ctx = ctx
 	session.sessionType = engineSession
