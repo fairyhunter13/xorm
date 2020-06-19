@@ -146,7 +146,7 @@ func (session *Session) bytes2Value(col *schemas.Column, fieldValue *reflect.Val
 		if err != nil {
 			return fmt.Errorf("arg %v as bool: %s", key, err.Error())
 		}
-		fieldValue.Set(reflect.ValueOf(v))
+		fieldValue.SetBool(v)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		sdata := string(data)
 		var x int64
