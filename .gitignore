@@ -8,6 +8,7 @@
 _obj
 _test
 vendor/
+test/
 
 # Architecture specific extensions/prefixes
 *.[568vq]
