@@ -14,6 +14,7 @@ import (
 	"github.com/fairyhunter13/xorm/convert"
 	"github.com/fairyhunter13/xorm/dialects"
 	"github.com/fairyhunter13/xorm/internal/json"
+	"github.com/fairyhunter13/xorm/internal/utils"
 	"github.com/fairyhunter13/xorm/schemas"
 )
 
@@ -24,21 +25,10 @@ var (
 // Value2Interface convert a field value of a struct to interface for puting into database
 func (statement *Statement) Value2Interface(col *schemas.Column, fieldValue reflect.Value) (interface{}, error) {
 	if fieldValue.CanAddr() {
-		if fieldConvert, ok := fieldValue.Addr().Interface().(convert.Conversion); ok {
-			data, err := fieldConvert.ToDB()
-			if err != nil {
-				return nil, err
+		if fieldConvert, ok := fieldValue.Addr().Interface().(convert.To); ok {
+			if utils.IsZero(fieldConvert) {
+				return nil, nil
 			}
-			if col.SQLType.IsBlob() {
-				return data, nil
-			}
-			return string(data), nil
-		}
-	}
-
-	isNil := fieldValue.Kind() == reflect.Ptr && fieldValue.IsNil()
-	if !isNil {
-		if fieldConvert, ok := fieldValue.Interface().(convert.Conversion); ok {
 			data, err := fieldConvert.ToDB()
 			if err != nil {
 				return nil, err
@@ -51,6 +41,23 @@ func (statement *Statement) Value2Interface(col *schemas.Column, fieldValue refl
 			}
 			return string(data), nil
 		}
+	}
+
+	if fieldConvert, ok := fieldValue.Interface().(convert.To); ok {
+		if utils.IsZero(fieldConvert) {
+			return nil, nil
+		}
+		data, err := fieldConvert.ToDB()
+		if err != nil {
+			return nil, err
+		}
+		if col.SQLType.IsBlob() {
+			return data, nil
+		}
+		if nil == data {
+			return nil, nil
+		}
+		return string(data), nil
 	}
 
 	fieldType := fieldValue.Type()

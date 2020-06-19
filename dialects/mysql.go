@@ -354,7 +354,7 @@ func (db *mysql) GetColumns(queryer core.Queryer, ctx context.Context, tableName
 
 		cts := strings.Split(colType, "(")
 		colName := strings.TrimSpace(colType)
-		colType = strings.ToUpper((lexermysql.GetType(colName)))
+		colType = strings.ToUpper(lexermysql.GetType(colName))
 		var len1, len2 int
 		if len(cts) == 2 {
 			idx := strings.Index(cts[1], ")")
