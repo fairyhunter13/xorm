@@ -17,6 +17,7 @@ import (
 	"github.com/fairyhunter13/xorm/internal/json"
 	"github.com/fairyhunter13/xorm/internal/utils"
 	"github.com/fairyhunter13/xorm/schemas"
+	"github.com/fairyhunter13/xorm/zero"
 )
 
 func (session *Session) str2Time(col *schemas.Column, data string) (outTime time.Time, outErr error) {
@@ -89,10 +90,16 @@ func (session *Session) byte2Time(col *schemas.Column, data []byte) (outTime tim
 // convert a db data([]byte) to a field value
 func (session *Session) bytes2Value(col *schemas.Column, fieldValue *reflect.Value, data []byte) error {
 	if structConvert, ok := fieldValue.Addr().Interface().(convert.Conversion); ok {
+		if zero.IsNil(structConvert) {
+			return nil
+		}
 		return structConvert.FromDB(data)
 	}
 
 	if structConvert, ok := fieldValue.Interface().(convert.Conversion); ok {
+		if zero.IsNil(structConvert) {
+			return nil
+		}
 		return structConvert.FromDB(data)
 	}
 
@@ -146,7 +153,7 @@ func (session *Session) bytes2Value(col *schemas.Column, fieldValue *reflect.Val
 		if err != nil {
 			return fmt.Errorf("arg %v as bool: %s", key, err.Error())
 		}
-		fieldValue.Set(reflect.ValueOf(v))
+		fieldValue.SetBool(v)
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		sdata := string(data)
 		var x int64
