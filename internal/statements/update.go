@@ -16,6 +16,7 @@ import (
 	"github.com/fairyhunter13/xorm/internal/json"
 	"github.com/fairyhunter13/xorm/internal/utils"
 	"github.com/fairyhunter13/xorm/schemas"
+	"github.com/fairyhunter13/xorm/zero"
 )
 
 func (statement *Statement) ifAddColUpdate(col *schemas.Column, includeVersion, includeUpdated, includeNil,
@@ -120,6 +121,9 @@ func (statement *Statement) BuildUpdates(tableValue reflect.Value,
 
 		if fieldValue.CanAddr() {
 			if structConvert, ok := fieldValue.Addr().Interface().(convert.Conversion); ok {
+				if zero.IsNil(structConvert) {
+					goto APPEND
+				}
 				data, err := structConvert.ToDB()
 				if err != nil {
 					return nil, nil, err
@@ -131,6 +135,9 @@ func (statement *Statement) BuildUpdates(tableValue reflect.Value,
 		}
 
 		if structConvert, ok := fieldValue.Interface().(convert.Conversion); ok {
+			if zero.IsNil(structConvert) {
+				goto APPEND
+			}
 			data, err := structConvert.ToDB()
 			if err != nil {
 				return nil, nil, err
