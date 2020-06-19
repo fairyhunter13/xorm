@@ -11,7 +11,6 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/fairyhunter13/xorm/convert"
 	"github.com/fairyhunter13/xorm/dialects"
 	"github.com/fairyhunter13/xorm/internal/json"
 	"github.com/fairyhunter13/xorm/internal/utils"
@@ -116,28 +115,20 @@ func (statement *Statement) BuildUpdates(tableValue reflect.Value,
 			}
 		}
 
-		var val interface{}
-
-		if fieldValue.CanAddr() {
-			if structConvert, ok := fieldValue.Addr().Interface().(convert.Conversion); ok {
-				data, err := structConvert.ToDB()
-				if err != nil {
-					return nil, nil, err
-				}
-
-				val = data
-				goto APPEND
-			}
+		var (
+			val        interface{}
+			isAppend   bool
+			isContinue bool
+		)
+		isAppend, isContinue, err = GetConversion(fieldValue, requiredField, &val)
+		if err != nil {
+			return nil, nil, err
 		}
-
-		if structConvert, ok := fieldValue.Interface().(convert.Conversion); ok && !fieldValue.IsNil() {
-			data, err := structConvert.ToDB()
-			if err != nil {
-				return nil, nil, err
-			}
-
-			val = data
+		if isAppend || val != nil {
 			goto APPEND
+		}
+		if isContinue {
+			continue
 		}
 
 		if fieldType.Kind() == reflect.Ptr {

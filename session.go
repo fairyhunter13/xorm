@@ -97,12 +97,7 @@ func newSessionID() string {
 }
 
 func newSession(engine *Engine) *Session {
-	session, valid := sessionPool.Get().(*Session)
-	if !valid {
-		session = new(Session)
-	}
-	session.Reset()
-
+	session := new(Session)
 	var ctx context.Context
 	if engine.logSessionID {
 		ctx = context.WithValue(engine.defaultContext, log.SessionIDKey, newSessionID())
@@ -144,7 +139,6 @@ func newSession(engine *Engine) *Session {
 
 // Close release the connection from pool
 func (session *Session) Close() error {
-	defer sessionPool.Put(session)
 	if !session.isClosed {
 		// When Close be called, if session is a transaction and do not call
 		// Commit or Rollback, then call Rollback.
@@ -449,7 +443,7 @@ func (session *Session) slice2Bean(scanResults []interface{}, fields []string, b
 		}
 
 		if fieldValue.CanAddr() {
-			if structConvert, ok := fieldValue.Addr().Interface().(convert.Conversion); ok {
+			if structConvert, ok := fieldValue.Addr().Interface().(convert.From); ok {
 				if data, err := value2Bytes(&rawValue); err == nil {
 					if err := structConvert.FromDB(data); err != nil {
 						return nil, err
@@ -461,12 +455,15 @@ func (session *Session) slice2Bean(scanResults []interface{}, fields []string, b
 			}
 		}
 
-		if _, ok := fieldValue.Interface().(convert.Conversion); ok {
+		if _, ok := fieldValue.Interface().(convert.From); ok {
 			if data, err := value2Bytes(&rawValue); err == nil {
 				if fieldValue.Kind() == reflect.Ptr && fieldValue.IsNil() {
 					fieldValue.Set(reflect.New(fieldValue.Type().Elem()))
 				}
-				fieldValue.Interface().(convert.Conversion).FromDB(data)
+				err = fieldValue.Interface().(convert.From).FromDB(data)
+				if err != nil {
+					return nil, err
+				}
 			} else {
 				return nil, err
 			}
