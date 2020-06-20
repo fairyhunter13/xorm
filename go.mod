@@ -9,7 +9,6 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/lib/pq v1.7.0
 	github.com/mattn/go-sqlite3 v1.14.0
-	github.com/panjf2000/ants/v2 v2.4.1
 	github.com/stretchr/testify v1.6.1
 	github.com/syndtr/goleveldb v1.0.0
 	github.com/ziutek/mymysql v1.5.4

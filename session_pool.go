@@ -1,7 +1,5 @@
 package xorm
 
-import "github.com/panjf2000/ants/v2"
-
 var sessionPool = newSessionPool()
 
 // SessionPool is a cutomized pooling for session.
@@ -27,7 +25,7 @@ func (sp *SessionPool) Get() (session *Session) {
 
 // Put puts the session into the pool.
 func (sp *SessionPool) Put(session *Session) {
-	ants.Submit(func() {
+	go func(session *Session) {
 		sp.sessionChan <- session
-	})
+	}(session)
 }
