@@ -97,7 +97,7 @@ func newSessionID() string {
 }
 
 func newSession(engine *Engine) *Session {
-	session := sessionPool.Get()
+	session := new(Session)
 	var ctx context.Context
 	if engine.logSessionID {
 		ctx = context.WithValue(engine.defaultContext, log.SessionIDKey, newSessionID())
@@ -139,7 +139,6 @@ func newSession(engine *Engine) *Session {
 
 // Close release the connection from pool
 func (session *Session) Close() error {
-	defer sessionPool.Put(session)
 	if !session.isClosed {
 		// When Close be called, if session is a transaction and do not call
 		// Commit or Rollback, then call Rollback.
