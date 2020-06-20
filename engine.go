@@ -315,6 +315,7 @@ func (engine *Engine) NewSession() *Session {
 
 // Close the engine
 func (engine *Engine) Close() error {
+	defer sessionPool.Close()
 	return engine.DB().Close()
 }
 
