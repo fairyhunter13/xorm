@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/fairyhunter13/xorm/contexts"
-	"github.com/fairyhunter13/xorm/convert"
 	"github.com/fairyhunter13/xorm/dialects"
 	"github.com/fairyhunter13/xorm/internal/json"
 	"github.com/fairyhunter13/xorm/internal/utils"
@@ -747,6 +746,22 @@ func (statement *Statement) buildConds2(table *schemas.Table, bean interface{},
 			}
 		}
 
+		var (
+			val        interface{}
+			isAppend   bool
+			isContinue bool
+		)
+		isAppend, isContinue, err = GetConversion(fieldValue, requiredField, &val)
+		if err != nil {
+			return nil, err
+		}
+		if isAppend || val != nil {
+			goto APPEND
+		}
+		if isContinue {
+			continue
+		}
+
 		if fieldType.Kind() == reflect.Ptr {
 			if fieldValue.IsNil() {
 				if includeNil {
@@ -763,7 +778,6 @@ func (statement *Statement) buildConds2(table *schemas.Table, bean interface{},
 			}
 		}
 
-		var val interface{}
 		switch fieldType.Kind() {
 		case reflect.Bool:
 			if allUseBool || requiredField {
@@ -805,8 +819,6 @@ func (statement *Statement) buildConds2(table *schemas.Table, bean interface{},
 					continue
 				}
 				val = dialects.FormatColumnTime(statement.dialect, statement.defaultTimeZone, col, t)
-			} else if _, ok := reflect.New(fieldType).Interface().(convert.Conversion); ok {
-				continue
 			} else if valNul, ok := fieldValue.Interface().(driver.Valuer); ok {
 				val, _ = valNul.Value()
 				if val == nil && !requiredField {
@@ -890,6 +902,7 @@ func (statement *Statement) buildConds2(table *schemas.Table, bean interface{},
 			val = fieldValue.Interface()
 		}
 
+	APPEND:
 		conds = append(conds, builder.Eq{colName: val})
 	}
 
