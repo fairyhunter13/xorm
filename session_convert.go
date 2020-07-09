@@ -112,13 +112,13 @@ func (session *Session) bytes2Value(col *schemas.Column, fieldValue *reflect.Val
 
 	switch fieldType.Kind() {
 	case reflect.Complex64, reflect.Complex128:
-		x := reflect.New(fieldType)
 		if len(data) > 0 {
-			err := json.DefaultJSONHandler.Unmarshal(data, x.Interface())
+			var x complex128
+			err := json.DefaultJSONHandler.Unmarshal(data, &x)
 			if err != nil {
 				return err
 			}
-			fieldValue.Set(x.Elem())
+			fieldValue.SetComplex(x)
 		}
 	case reflect.Slice, reflect.Array, reflect.Map:
 		v = data
