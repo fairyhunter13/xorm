@@ -439,7 +439,7 @@ func (session *Session) slice2Bean(scanResults []interface{}, fields []string, b
 		}
 
 		if fieldValue.CanAddr() {
-			if structConvert, ok := fieldValue.Addr().Interface().(convert.Conversion); ok {
+			if structConvert, ok := fieldValue.Addr().Interface().(convert.From); ok {
 				if data, err := value2Bytes(&rawValue); err == nil {
 					if err := structConvert.FromDB(data); err != nil {
 						return nil, err
@@ -451,12 +451,15 @@ func (session *Session) slice2Bean(scanResults []interface{}, fields []string, b
 			}
 		}
 
-		if _, ok := fieldValue.Interface().(convert.Conversion); ok {
+		if _, ok := fieldValue.Interface().(convert.From); ok {
 			if data, err := value2Bytes(&rawValue); err == nil {
 				if fieldValue.Kind() == reflect.Ptr && fieldValue.IsNil() {
 					fieldValue.Set(reflect.New(fieldValue.Type().Elem()))
 				}
-				fieldValue.Interface().(convert.Conversion).FromDB(data)
+				err = fieldValue.Interface().(convert.From).FromDB(data)
+				if err != nil {
+					return nil, err
+				}
 			} else {
 				return nil, err
 			}

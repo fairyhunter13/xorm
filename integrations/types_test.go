@@ -193,6 +193,11 @@ func TestConversion(t *testing.T) {
 	assert.EqualValues(t, *c.Slice[0], *c1.Slice[0])
 	assert.EqualValues(t, *c.Slice[1], *c1.Slice[1])
 
+	var cNew ConvStruct
+	var cond ConvStruct
+	_, err = testEngine.MustCols("conv2", "cfg2").Update(&cNew, &cond)
+	assert.NoError(t, err)
+
 	cnt, err := testEngine.Where("1=1").Delete(new(ConvStruct))
 	assert.NoError(t, err)
 	assert.EqualValues(t, 1, cnt)
