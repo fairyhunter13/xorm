@@ -3,10 +3,9 @@ package statements
 import (
 	"reflect"
 
+	"github.com/fairyhunter13/reflecthelper"
 	"github.com/fairyhunter13/xorm/bits"
 	"github.com/fairyhunter13/xorm/convert"
-	"github.com/fairyhunter13/xorm/internal/utils"
-	"github.com/fairyhunter13/xorm/reflection"
 )
 
 // GetConversion is a function to assign val from the convert.To interface to extract the data.
@@ -32,7 +31,7 @@ func GetConversion(fieldValue reflect.Value, requiredField bool, val *interface{
 		copyVal = reflect.ValueOf(fieldValue.Interface())
 	}
 
-	copyVal = *reflection.GetElem(&copyVal)
+	copyVal = reflecthelper.GetInitElem(copyVal)
 	if copyVal.CanAddr() {
 		copyVal = copyVal.Addr()
 	}
@@ -49,7 +48,7 @@ func GetConversion(fieldValue reflect.Value, requiredField bool, val *interface{
 
 func getDataConversion(fieldValue reflect.Value, requiredField bool, val *interface{}) (isAppend bool, err error) {
 	if structConvert, ok := fieldValue.Interface().(convert.To); ok {
-		if utils.IsZero(structConvert) {
+		if reflecthelper.IsZero(structConvert) {
 			if requiredField {
 				isAppend = true
 			}

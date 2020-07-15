@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/fairyhunter13/decimal"
+	"github.com/fairyhunter13/newtype"
 	"github.com/fairyhunter13/xorm"
 	"github.com/fairyhunter13/xorm/convert"
 	"github.com/fairyhunter13/xorm/internal/json"
@@ -379,4 +381,62 @@ func TestCustomType2(t *testing.T) {
 	assert.EqualValues(t, 1, len(users))
 
 	fmt.Println(users)
+}
+
+type externalType struct {
+	Amount    decimal.Decimal  `xorm:"'amount'"`
+	NilAmount *decimal.Decimal `xorm:"'nil_amount'"`
+	Cond      newtype.Bool     `xorm:"'cond'"`
+	NilCond   *newtype.Bool    `xorm:"'nil_cond'"`
+}
+
+func TestConversionExternalType(t *testing.T) {
+	assert.NoError(t, PrepareEngine())
+
+	c := new(externalType)
+	assert.NoError(t, testEngine.DropTables(c))
+	assert.NoError(t, testEngine.Sync2(c))
+
+	c.Cond = newtype.Bool(false)
+
+	_, err := testEngine.MustCols("amount", "nil_amount").Insert(c)
+	assert.NoError(t, err)
+
+	c1 := new(externalType)
+	has, err := testEngine.Get(c1)
+	assert.NoError(t, err)
+	assert.True(t, has)
+	assert.Nil(t, c1.NilCond)
+	assert.False(t, bool(c1.Cond))
+	assert.Nil(t, c1.NilAmount)
+	assert.EqualValues(t, decimal.Zero.String(), c1.Amount.String())
+
+	var cNew externalType
+	var cond externalType
+	_, err = testEngine.MustCols("amount", "nil_amount").Update(&cNew, &cond)
+	assert.NoError(t, err)
+
+	cnt, err := testEngine.Where("1=1").Delete(new(externalType))
+	assert.NoError(t, err)
+	assert.EqualValues(t, 1, cnt)
+
+	amount := decimal.NewFromInt(0)
+	boolVal := newtype.Bool(false)
+	c.NilAmount = &amount
+	c.NilCond = &boolVal
+	c.Cond = newtype.Bool(true)
+	c.Amount = decimal.NewFromInt(5)
+	_, err = testEngine.Insert(c)
+	assert.NoError(t, err)
+
+	c2 := new(externalType)
+	has, err = testEngine.Get(c2)
+	assert.NoError(t, err)
+	assert.True(t, has)
+	assert.NotNil(t, c.NilAmount)
+	assert.EqualValues(t, decimal.Zero.String(), c.NilAmount.String())
+	assert.NotNil(t, c.NilCond)
+	assert.False(t, bool(*c.NilCond))
+	assert.EqualValues(t, decimal.NewFromInt(5).String(), c.Amount.String())
+	assert.True(t, bool(c.Cond))
 }
