@@ -11,9 +11,9 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/fairyhunter13/reflecthelper"
 	"github.com/fairyhunter13/xorm/dialects"
 	"github.com/fairyhunter13/xorm/internal/json"
-	"github.com/fairyhunter13/xorm/internal/utils"
 	"github.com/fairyhunter13/xorm/schemas"
 )
 
@@ -107,7 +107,7 @@ func (statement *Statement) BuildUpdates(tableValue reflect.Value,
 
 		// !evalphobia! set fieldValue as nil when column is nullable and zero-value
 		if b, ok := getFlagForColumn(nullableMap, col); ok {
-			if b && col.Nullable && utils.IsZero(fieldValue.Interface()) {
+			if b && col.Nullable && reflecthelper.IsZero(fieldValue.Interface()) {
 				var nilValue *int
 				fieldValue = reflect.ValueOf(nilValue)
 				fieldType = reflect.TypeOf(fieldValue.Interface())
@@ -203,7 +203,7 @@ func (statement *Statement) BuildUpdates(tableValue reflect.Value,
 						if len(table.PrimaryKeys) == 1 {
 							pkField := reflect.Indirect(fieldValue).FieldByName(table.PKColumns()[0].FieldName)
 							// fix non-int pk issues
-							if pkField.IsValid() && (!requiredField && !utils.IsZero(pkField.Interface())) {
+							if pkField.IsValid() && (!requiredField && !reflecthelper.IsZero(pkField.Interface())) {
 								val = pkField.Interface()
 							} else {
 								continue
@@ -214,7 +214,7 @@ func (statement *Statement) BuildUpdates(tableValue reflect.Value,
 					}
 				} else {
 					// Blank struct could not be as update data
-					if requiredField || !utils.IsStructZero(fieldValue) {
+					if requiredField || !reflecthelper.IsStructZero(fieldValue) {
 						bytes, err := json.DefaultJSONHandler.Marshal(fieldValue.Interface())
 						if err != nil {
 							return nil, nil, fmt.Errorf("mashal %v failed", fieldValue.Interface())
@@ -235,7 +235,7 @@ func (statement *Statement) BuildUpdates(tableValue reflect.Value,
 					continue
 				}
 				if fieldType.Kind() == reflect.Array {
-					if utils.IsArrayZero(fieldValue) {
+					if reflecthelper.IsArrayZero(fieldValue) {
 						continue
 					}
 				} else if fieldValue.IsNil() || !fieldValue.IsValid() || fieldValue.Len() == 0 {
