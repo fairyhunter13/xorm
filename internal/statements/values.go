@@ -11,10 +11,10 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/fairyhunter13/reflecthelper"
 	"github.com/fairyhunter13/xorm/convert"
 	"github.com/fairyhunter13/xorm/dialects"
 	"github.com/fairyhunter13/xorm/internal/json"
-	"github.com/fairyhunter13/xorm/internal/utils"
 	"github.com/fairyhunter13/xorm/schemas"
 )
 
@@ -26,7 +26,7 @@ var (
 func (statement *Statement) Value2Interface(col *schemas.Column, fieldValue reflect.Value) (interface{}, error) {
 	if fieldValue.CanAddr() {
 		if fieldConvert, ok := fieldValue.Addr().Interface().(convert.To); ok {
-			if utils.IsZero(fieldConvert) {
+			if reflecthelper.IsInterfaceReflectZero(fieldConvert) {
 				return nil, nil
 			}
 			data, err := fieldConvert.ToDB()
@@ -41,7 +41,7 @@ func (statement *Statement) Value2Interface(col *schemas.Column, fieldValue refl
 	}
 
 	if fieldConvert, ok := fieldValue.Interface().(convert.To); ok {
-		if utils.IsZero(fieldConvert) {
+		if reflecthelper.IsInterfaceReflectZero(fieldConvert) {
 			return nil, nil
 		}
 		data, err := fieldConvert.ToDB()
