@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/fairyhunter13/xorm/internal/utils"
+	"github.com/fairyhunter13/reflecthelper"
 	"github.com/fairyhunter13/xorm/schemas"
 )
 
@@ -149,7 +149,7 @@ func (session *Session) innerInsertMulti(rowsSlicePtr interface{}) (int64, error
 				return 0, err
 			}
 			fieldValue := *ptrFieldValue
-			if col.IsAutoIncrOrDefaultExist() && utils.IsZero(fieldValue.Interface()) {
+			if col.IsAutoIncrOrDefaultExist() && reflecthelper.IsZero(fieldValue.Interface()) {
 				continue
 			}
 			if col.MapType == schemas.ONLYFROMDB {
@@ -524,13 +524,13 @@ func (session *Session) genInsertColumns(bean interface{}) ([]string, []interfac
 		}
 		fieldValue := *fieldValuePtr
 
-		if col.IsAutoIncrOrDefaultExist() && utils.IsValueZero(fieldValue) {
+		if col.IsAutoIncrOrDefaultExist() && reflecthelper.IsValueZero(fieldValue) {
 			continue
 		}
 
 		// !evalphobia! set fieldValue as nil when column is nullable and zero-value
 		if _, ok := getFlagForColumn(session.statement.NullableMap, col); ok {
-			if col.Nullable && utils.IsValueZero(fieldValue) {
+			if col.Nullable && reflecthelper.IsValueZero(fieldValue) {
 				var nilValue *int
 				fieldValue = reflect.ValueOf(nilValue)
 			}
