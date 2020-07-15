@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/fairyhunter13/reflecthelper"
 	"github.com/fairyhunter13/xorm/caches"
 	"github.com/fairyhunter13/xorm/internal/utils"
 	"github.com/fairyhunter13/xorm/schemas"
@@ -484,7 +485,7 @@ func (session *Session) genUpdateColumns(bean interface{}) ([]string, []interfac
 		}
 		fieldValue := *fieldValuePtr
 
-		if col.IsAutoIncrement && utils.IsValueZero(fieldValue) {
+		if col.IsAutoIncrement && reflecthelper.IsValueZero(fieldValue) {
 			continue
 		}
 
@@ -507,7 +508,7 @@ func (session *Session) genUpdateColumns(bean interface{}) ([]string, []interfac
 
 		// !evalphobia! set fieldValue as nil when column is nullable and zero-value
 		if _, ok := getFlagForColumn(session.statement.NullableMap, col); ok {
-			if col.Nullable && utils.IsValueZero(fieldValue) {
+			if col.Nullable && reflecthelper.IsValueZero(fieldValue) {
 				var nilValue *int
 				fieldValue = reflect.ValueOf(nilValue)
 			}

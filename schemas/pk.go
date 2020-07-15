@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"encoding/gob"
 
-	"github.com/fairyhunter13/xorm/internal/utils"
+	"github.com/fairyhunter13/reflecthelper"
 )
 
 type PK []interface{}
@@ -20,7 +20,7 @@ func NewPK(pks ...interface{}) *PK {
 
 func (p *PK) IsZero() bool {
 	for _, k := range *p {
-		if utils.IsZero(k) {
+		if reflecthelper.IsZero(k) {
 			return true
 		}
 	}
