@@ -532,12 +532,12 @@ func (session *Session) slice2Bean(scanResults []interface{}, fields []string, b
 						return nil, err
 					}
 				} else {
-					x := reflect.New(fieldType)
-					err := json.DefaultJSONHandler.Unmarshal(bs, x.Interface())
+					var x complex128
+					err := json.DefaultJSONHandler.Unmarshal(bs, &x)
 					if err != nil {
 						return nil, err
 					}
-					fieldValue.Set(x.Elem())
+					fieldValue.SetComplex(x)
 				}
 			}
 		case reflect.Slice, reflect.Array:

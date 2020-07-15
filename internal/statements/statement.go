@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fairyhunter13/reflecthelper"
 	"github.com/fairyhunter13/xorm/contexts"
 	"github.com/fairyhunter13/xorm/dialects"
 	"github.com/fairyhunter13/xorm/internal/json"
@@ -850,7 +851,7 @@ func (statement *Statement) buildConds2(table *schemas.Table, bean interface{},
 							pkField := reflect.Indirect(fieldValue).FieldByName(table.PKColumns()[0].FieldName)
 							// fix non-int pk issues
 							//if pkField.Int() != 0 {
-							if pkField.IsValid() && !utils.IsZero(pkField.Interface()) {
+							if pkField.IsValid() && !reflecthelper.IsZero(pkField.Interface()) {
 								val = pkField.Interface()
 							} else {
 								continue
@@ -996,7 +997,7 @@ func (statement *Statement) CondDeleted(col *schemas.Column) builder.Cond {
 	} else {
 		// FIXME: mssql: The conversion of a nvarchar data type to a datetime data type resulted in an out-of-range value.
 		if statement.dialect.URI().DBType != schemas.MSSQL {
-			cond = builder.Eq{colName: utils.ZeroTime1}
+			cond = builder.Eq{colName: reflecthelper.ZeroTime1}
 		}
 	}
 

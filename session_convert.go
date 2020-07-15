@@ -13,9 +13,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fairyhunter13/reflecthelper"
 	"github.com/fairyhunter13/xorm/convert"
 	"github.com/fairyhunter13/xorm/internal/json"
-	"github.com/fairyhunter13/xorm/internal/utils"
 	"github.com/fairyhunter13/xorm/reflection"
 	"github.com/fairyhunter13/xorm/schemas"
 )
@@ -30,7 +30,7 @@ func (session *Session) str2Time(col *schemas.Column, data string) (outTime time
 		parseLoc = col.TimeZone
 	}
 
-	if sdata == utils.ZeroTime0 || sdata == utils.ZeroTime1 {
+	if sdata == reflecthelper.ZeroTime0 || sdata == reflecthelper.ZeroTime1 {
 	} else if !strings.ContainsAny(sdata, "- :") { // !nashtsai! has only found that mymysql driver is using this for time type column
 		// time stamp
 		sd, err := strconv.ParseInt(sdata, 10, 64)
@@ -91,7 +91,7 @@ func (session *Session) byte2Time(col *schemas.Column, data []byte) (outTime tim
 func (session *Session) bytes2Value(col *schemas.Column, fieldValue *reflect.Value, data []byte) error {
 	if fieldValue.CanAddr() {
 		if structConvert, ok := fieldValue.Addr().Interface().(convert.From); ok {
-			if utils.IsZero(structConvert) {
+			if reflecthelper.IsZero(structConvert) {
 				return nil
 			}
 			return structConvert.FromDB(data)
@@ -99,13 +99,14 @@ func (session *Session) bytes2Value(col *schemas.Column, fieldValue *reflect.Val
 	}
 
 	if structConvert, ok := fieldValue.Interface().(convert.From); ok {
-		if utils.IsZero(structConvert) {
+		if reflecthelper.IsZero(structConvert) {
 			return nil
 		}
 		return structConvert.FromDB(data)
 	}
 
-	fieldValue = reflection.GetElem(fieldValue)
+	defer reflection.RevertVal2Zero(*fieldValue)
+	*fieldValue = reflecthelper.GetInitElem(*fieldValue)
 	var v interface{}
 	key := col.Name
 	fieldType := fieldValue.Type()
