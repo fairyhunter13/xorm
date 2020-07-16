@@ -26,35 +26,11 @@ var (
 func (statement *Statement) Value2Interface(col *schemas.Column, fieldValue reflect.Value) (interface{}, error) {
 	if fieldValue.CanAddr() {
 		if fieldConvert, ok := fieldValue.Addr().Interface().(convert.To); ok {
-			if reflecthelper.IsInterfaceReflectZero(fieldConvert) {
-				return nil, nil
-			}
-			data, err := fieldConvert.ToDB()
-			if err != nil {
-				return nil, err
-			}
-			if col.SQLType.IsBlob() {
-				return data, nil
-			}
-			return string(data), nil
+			return statement.val2Interface(fieldConvert, col, false)
 		}
 	}
-
 	if fieldConvert, ok := fieldValue.Interface().(convert.To); ok {
-		if reflecthelper.IsInterfaceReflectZero(fieldConvert) {
-			return nil, nil
-		}
-		data, err := fieldConvert.ToDB()
-		if err != nil {
-			return nil, err
-		}
-		if col.SQLType.IsBlob() {
-			return data, nil
-		}
-		if nil == data {
-			return nil, nil
-		}
-		return string(data), nil
+		return statement.val2Interface(fieldConvert, col, true)
 	}
 
 	fieldType := fieldValue.Type()
@@ -158,4 +134,23 @@ func (statement *Statement) Value2Interface(col *schemas.Column, fieldValue refl
 	default:
 		return fieldValue.Interface(), nil
 	}
+}
+
+func (statement *Statement) val2Interface(fieldConvert convert.To, col *schemas.Column, isNonAddr bool) (interface{}, error) {
+	if reflecthelper.IsInterfaceReflectZero(fieldConvert) {
+		return nil, nil
+	}
+	data, err := fieldConvert.ToDB()
+	if err != nil {
+		return nil, err
+	}
+	if col.SQLType.IsBlob() {
+		return data, nil
+	}
+	if isNonAddr {
+		if nil == data {
+			return nil, nil
+		}
+	}
+	return string(data), nil
 }
