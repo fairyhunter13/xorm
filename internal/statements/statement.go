@@ -14,6 +14,7 @@ import (
 
 	"github.com/fairyhunter13/reflecthelper"
 	"github.com/fairyhunter13/xorm/contexts"
+	"github.com/fairyhunter13/xorm/convert"
 	"github.com/fairyhunter13/xorm/dialects"
 	"github.com/fairyhunter13/xorm/internal/json"
 	"github.com/fairyhunter13/xorm/internal/utils"
@@ -748,24 +749,23 @@ func (statement *Statement) buildConds2(table *schemas.Table, bean interface{},
 		}
 
 		var (
-			val        interface{}
-			isAppend   bool
-			isContinue bool
+			val                  interface{}
+			isAppend, isContinue bool
 		)
-		isAppend, isContinue, err = GetConversion(fieldValue, requiredField, &val)
+		isAppend, isContinue, err = statement.convertToDB(fieldValue, requiredField, includeNil, &val)
 		if err != nil {
 			return nil, err
-		}
-		if isAppend || val != nil {
-			goto APPEND
 		}
 		if isContinue {
 			continue
 		}
+		if isAppend {
+			goto APPEND
+		}
 
 		if fieldType.Kind() == reflect.Ptr {
 			if fieldValue.IsNil() {
-				if includeNil {
+				if statement.IsNilIncluded(requiredField, includeNil) {
 					conds = append(conds, builder.Eq{colName: nil})
 				}
 				continue
@@ -1006,4 +1006,43 @@ func (statement *Statement) CondDeleted(col *schemas.Column) builder.Cond {
 	}
 
 	return cond
+}
+
+func (statement *Statement) convertToDB(fieldValue reflect.Value, requiredField, includeNil bool, val *interface{}) (isAppend, isContinue bool, err error) {
+	if fieldValue.CanAddr() {
+		if structConvert, ok := fieldValue.Addr().Interface().(convert.To); ok {
+			isAppend, isContinue, err = statement.assignToDB2Val(structConvert, requiredField, includeNil, val)
+			if err != nil {
+				return
+			}
+			if isAppend || isContinue {
+				return
+			}
+		}
+	}
+
+	if structConvert, ok := fieldValue.Interface().(convert.To); ok {
+		isAppend, isContinue, err = statement.assignToDB2Val(structConvert, requiredField, includeNil, val)
+	}
+	return
+}
+
+func (statement *Statement) assignToDB2Val(structConvert convert.To, requiredField, includeNil bool, val *interface{}) (isAppend, isContinue bool, err error) {
+	if statement.IsNilIncluded(requiredField, includeNil) && reflecthelper.IsInterfaceReflectZero(structConvert) {
+		isAppend = true
+		return
+	}
+	if !requiredField && reflecthelper.IsZero(structConvert) {
+		isContinue = true
+		return
+	}
+	var data []byte
+	data, err = structConvert.ToDB()
+	if err != nil {
+		return
+	}
+
+	*val = data
+	isAppend = true
+	return
 }
