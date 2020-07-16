@@ -116,24 +116,23 @@ func (statement *Statement) BuildUpdates(tableValue reflect.Value,
 		}
 
 		var (
-			val        interface{}
-			isAppend   bool
-			isContinue bool
+			val                  interface{}
+			isAppend, isContinue bool
 		)
-		isAppend, isContinue, err = GetConversion(fieldValue, requiredField, &val)
+		isAppend, isContinue, err = statement.convertToDB(fieldValue, requiredField, includeNil, &val)
 		if err != nil {
 			return nil, nil, err
-		}
-		if isAppend || val != nil {
-			goto APPEND
 		}
 		if isContinue {
 			continue
 		}
+		if isAppend {
+			goto APPEND
+		}
 
 		if fieldType.Kind() == reflect.Ptr {
 			if fieldValue.IsNil() {
-				if includeNil {
+				if statement.IsNilIncluded(requiredField, includeNil) {
 					args = append(args, nil)
 					colNames = append(colNames, fmt.Sprintf("%v=?", statement.quote(col.Name)))
 				}
