@@ -8,8 +8,8 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20200620013148-b91950f658ec
 	github.com/fairyhunter13/decimal v1.2.0-imp-4
-	github.com/fairyhunter13/newtype v1.0.9
-	github.com/fairyhunter13/reflecthelper v1.0.7
+	github.com/fairyhunter13/newtype v1.0.10
+	github.com/fairyhunter13/reflecthelper v1.0.8
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/lib/pq v1.7.0
 	github.com/mattn/go-sqlite3 v1.14.0

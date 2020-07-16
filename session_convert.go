@@ -91,18 +91,12 @@ func (session *Session) byte2Time(col *schemas.Column, data []byte) (outTime tim
 func (session *Session) bytes2Value(col *schemas.Column, fieldValue *reflect.Value, data []byte) error {
 	if fieldValue.CanAddr() {
 		if structConvert, ok := fieldValue.Addr().Interface().(convert.From); ok {
-			if reflecthelper.IsZero(structConvert) {
-				return nil
-			}
-			return structConvert.FromDB(data)
+			return session.scanBytes(structConvert, data)
 		}
 	}
 
 	if structConvert, ok := fieldValue.Interface().(convert.From); ok {
-		if reflecthelper.IsZero(structConvert) {
-			return nil
-		}
-		return structConvert.FromDB(data)
+		return session.scanBytes(structConvert, data)
 	}
 
 	defer reflection.RevertVal2Zero(*fieldValue)
@@ -275,4 +269,12 @@ func (session *Session) bytes2Value(col *schemas.Column, fieldValue *reflect.Val
 	}
 
 	return nil
+}
+
+func (session *Session) scanBytes(structConvert convert.From, data []byte) (err error) {
+	if reflecthelper.IsZero(structConvert) {
+		return
+	}
+	err = structConvert.FromDB(data)
+	return
 }
