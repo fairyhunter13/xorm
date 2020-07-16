@@ -195,10 +195,18 @@ func TestConversion(t *testing.T) {
 	assert.EqualValues(t, *c.Slice[0], *c1.Slice[0])
 	assert.EqualValues(t, *c.Slice[1], *c1.Slice[1])
 
-	var cNew ConvStruct
-	var cond ConvStruct
-	_, err = testEngine.MustCols("conv2", "cfg2").Update(&cNew, &cond)
+	var (
+		cNew ConvStruct
+		cond ConvStruct
+		res  int64
+	)
+	res, err = testEngine.MustCols("conv", "conv2").Update(&cNew, &cond)
 	assert.NoError(t, err)
+	assert.EqualValues(t, 0, res)
+
+	res, err = testEngine.MustCols("conv2", "cfg2", "cfg3").Update(&cNew, &cond)
+	assert.NoError(t, err)
+	assert.EqualValues(t, 0, res)
 
 	cnt, err := testEngine.Where("1=1").Delete(new(ConvStruct))
 	assert.NoError(t, err)
@@ -411,10 +419,19 @@ func TestConversionExternalType(t *testing.T) {
 	assert.Nil(t, c1.NilAmount)
 	assert.EqualValues(t, decimal.Zero.String(), c1.Amount.String())
 
-	var cNew externalType
-	var cond externalType
-	_, err = testEngine.MustCols("amount", "nil_amount").Update(&cNew, &cond)
+	var (
+		cNew externalType
+		cond externalType
+		res  int64
+	)
+	res, err = testEngine.MustCols("cond", "nil_cond").Update(&cNew, &cond)
 	assert.NoError(t, err)
+	assert.EqualValues(t, 0, res)
+
+	res, err = testEngine.MustCols("amount", "nil_amount").Update(&cNew, &cond)
+	assert.NoError(t, err)
+	assert.EqualValues(t, 0, res)
+	fmt.Println(cNew, cond)
 
 	cnt, err := testEngine.Where("1=1").Delete(new(externalType))
 	assert.NoError(t, err)
