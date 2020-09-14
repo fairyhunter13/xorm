@@ -36,7 +36,14 @@ func TestRevertVal2Zero(t *testing.T) {
 		RevertVal2Zero(val)
 
 		assert.True(t, reflecthelper.IsValueZero(val))
-		assert.NotNil(t, x)
-		assert.Nil(t, *x)
+		assert.Nil(t, x)
+	})
+	t.Run("invalid reflect value", func(t *testing.T) {
+		var test interface{}
+		val := reflect.ValueOf(test)
+		RevertVal2Zero(val)
+
+		assert.True(t, reflecthelper.IsValueZero(val))
+		assert.Nil(t, test)
 	})
 }
