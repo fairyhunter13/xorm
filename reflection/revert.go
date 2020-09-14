@@ -13,10 +13,10 @@ func RevertVal2Zero(val reflect.Value) {
 	}
 
 	kind := reflecthelper.GetKind(val)
-	elemKind := kind
-	elemKind = reflecthelper.GetElemKind(val)
+	elemKind := reflecthelper.GetElemKind(val)
+	originVal := val
 
-	for kind == reflect.Ptr && elemKind == reflect.Ptr {
+	for isValueElemable(kind) && isValueElemable(elemKind) {
 		val = val.Elem()
 
 		kind = reflecthelper.GetKind(val)
@@ -24,6 +24,13 @@ func RevertVal2Zero(val reflect.Value) {
 	}
 
 	if reflecthelper.IsValueZero(val) {
-		reflecthelper.SetReflectZero(val)
+		if !originVal.CanSet() && isValueElemable(reflecthelper.GetKind(originVal)) {
+			originVal = originVal.Elem()
+		}
+		reflecthelper.SetReflectZero(originVal)
 	}
+}
+
+func isValueElemable(kind reflect.Kind) bool {
+	return kind == reflect.Ptr || kind == reflect.Interface
 }
