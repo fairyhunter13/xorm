@@ -911,8 +911,9 @@ func (statement *Statement) buildConds2(table *schemas.Table, bean interface{},
 }
 
 func (statement *Statement) BuildConds(table *schemas.Table, bean interface{}, includeVersion bool, includeUpdated bool, includeNil bool, includeAutoIncr bool, addedTableName bool) (builder.Cond, error) {
+	tableName := dialects.FullTableName(statement.dialect, statement.tagParser.GetTableMapper(), bean, true)
 	return statement.buildConds2(table, bean, includeVersion, includeUpdated, includeNil, includeAutoIncr, statement.allUseBool, statement.useAllCols,
-		statement.unscoped, statement.MustColumnMap, statement.TableName(), statement.TableAlias, addedTableName)
+		statement.unscoped, statement.MustColumnMap, tableName, statement.TableAlias, addedTableName)
 }
 
 func (statement *Statement) mergeConds(bean interface{}) error {
