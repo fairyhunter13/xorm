@@ -11,7 +11,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/fairyhunter13/reflecthelper"
+	"github.com/fairyhunter13/reflecthelper/v3"
 	"github.com/fairyhunter13/xorm/convert"
 	"github.com/fairyhunter13/xorm/dialects"
 	"github.com/fairyhunter13/xorm/internal/json"
