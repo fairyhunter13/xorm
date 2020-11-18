@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/fairyhunter13/reflecthelper"
+	"github.com/fairyhunter13/reflecthelper/v3"
 	"github.com/fairyhunter13/xorm/schemas"
 )
 
