@@ -81,7 +81,7 @@ func NewEngine(driverName string, source interface{}) (*Engine, error) {
 		return nil, err
 	}
 
-	return newEngine(driverName, dataSourceName, dialect, db)
+	return newEngine(driverName, dsn, dialect, db)
 }
 
 func newEngine(driverName, dataSourceName string, dialect dialects.Dialect, db *core.DB) (*Engine, error) {
@@ -96,7 +96,7 @@ func newEngine(driverName, dataSourceName string, dialect dialects.Dialect, db *
 		cacherMgr:      cacherMgr,
 		tagParser:      tagParser,
 		driverName:     driverName,
-		dataSourceName: dsn,
+		dataSourceName: dataSourceName,
 		db:             db,
 		logSessionID:   false,
 	}
