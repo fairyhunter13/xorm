@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"encoding/gob"
 
-	"github.com/fairyhunter13/reflecthelper"
+	"github.com/fairyhunter13/reflecthelper/v3"
 )
 
 type PK []interface{}
