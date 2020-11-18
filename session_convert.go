@@ -13,10 +13,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fairyhunter13/reflecthelper"
+	"github.com/fairyhunter13/reflecthelper/v3"
 	"github.com/fairyhunter13/xorm/convert"
 	"github.com/fairyhunter13/xorm/internal/json"
-	"github.com/fairyhunter13/xorm/reflection"
 	"github.com/fairyhunter13/xorm/schemas"
 )
 
@@ -99,21 +98,19 @@ func (session *Session) bytes2Value(col *schemas.Column, fieldValue *reflect.Val
 		return session.scanBytes(structConvert, data)
 	}
 
-	defer reflection.RevertVal2Zero(*fieldValue)
-	*fieldValue = reflecthelper.GetInitElem(*fieldValue)
 	var v interface{}
 	key := col.Name
 	fieldType := fieldValue.Type()
 
 	switch fieldType.Kind() {
 	case reflect.Complex64, reflect.Complex128:
+		x := reflect.New(fieldType)
 		if len(data) > 0 {
-			var x complex128
-			err := json.DefaultJSONHandler.Unmarshal(data, &x)
+			err := json.DefaultJSONHandler.Unmarshal(data, x.Interface())
 			if err != nil {
 				return err
 			}
-			fieldValue.SetComplex(x)
+			fieldValue.Set(x.Elem())
 		}
 	case reflect.Slice, reflect.Array, reflect.Map:
 		v = data
@@ -241,6 +238,290 @@ func (session *Session) bytes2Value(col *schemas.Column, fieldValue *reflect.Val
 					}
 				}
 			}
+		}
+	case reflect.Ptr:
+		// !nashtsai! TODO merge duplicated codes above
+		//typeStr := fieldType.String()
+		switch fieldType.Elem().Kind() {
+		// case "*string":
+		case schemas.StringType.Kind():
+			x := string(data)
+			fieldValue.Set(reflect.ValueOf(&x).Convert(fieldType))
+		// case "*bool":
+		case schemas.BoolType.Kind():
+			d := string(data)
+			v, err := strconv.ParseBool(d)
+			if err != nil {
+				return fmt.Errorf("arg %v as bool: %s", key, err.Error())
+			}
+			fieldValue.Set(reflect.ValueOf(&v).Convert(fieldType))
+		// case "*complex64":
+		case schemas.Complex64Type.Kind():
+			var x complex64
+			if len(data) > 0 {
+				err := json.DefaultJSONHandler.Unmarshal(data, &x)
+				if err != nil {
+					return err
+				}
+				fieldValue.Set(reflect.ValueOf(&x).Convert(fieldType))
+			}
+		// case "*complex128":
+		case schemas.Complex128Type.Kind():
+			var x complex128
+			if len(data) > 0 {
+				err := json.DefaultJSONHandler.Unmarshal(data, &x)
+				if err != nil {
+					return err
+				}
+				fieldValue.Set(reflect.ValueOf(&x).Convert(fieldType))
+			}
+		// case "*float64":
+		case schemas.Float64Type.Kind():
+			x, err := strconv.ParseFloat(string(data), 64)
+			if err != nil {
+				return fmt.Errorf("arg %v as float64: %s", key, err.Error())
+			}
+			fieldValue.Set(reflect.ValueOf(&x).Convert(fieldType))
+		// case "*float32":
+		case schemas.Float32Type.Kind():
+			var x float32
+			x1, err := strconv.ParseFloat(string(data), 32)
+			if err != nil {
+				return fmt.Errorf("arg %v as float32: %s", key, err.Error())
+			}
+			x = float32(x1)
+			fieldValue.Set(reflect.ValueOf(&x).Convert(fieldType))
+		// case "*uint64":
+		case schemas.Uint64Type.Kind():
+			var x uint64
+			x, err := strconv.ParseUint(string(data), 10, 64)
+			if err != nil {
+				return fmt.Errorf("arg %v as int: %s", key, err.Error())
+			}
+			fieldValue.Set(reflect.ValueOf(&x).Convert(fieldType))
+		// case "*uint":
+		case schemas.UintType.Kind():
+			var x uint
+			x1, err := strconv.ParseUint(string(data), 10, 64)
+			if err != nil {
+				return fmt.Errorf("arg %v as int: %s", key, err.Error())
+			}
+			x = uint(x1)
+			fieldValue.Set(reflect.ValueOf(&x).Convert(fieldType))
+		// case "*uint32":
+		case schemas.Uint32Type.Kind():
+			var x uint32
+			x1, err := strconv.ParseUint(string(data), 10, 64)
+			if err != nil {
+				return fmt.Errorf("arg %v as int: %s", key, err.Error())
+			}
+			x = uint32(x1)
+			fieldValue.Set(reflect.ValueOf(&x).Convert(fieldType))
+		// case "*uint8":
+		case schemas.Uint8Type.Kind():
+			var x uint8
+			x1, err := strconv.ParseUint(string(data), 10, 64)
+			if err != nil {
+				return fmt.Errorf("arg %v as int: %s", key, err.Error())
+			}
+			x = uint8(x1)
+			fieldValue.Set(reflect.ValueOf(&x).Convert(fieldType))
+		// case "*uint16":
+		case schemas.Uint16Type.Kind():
+			var x uint16
+			x1, err := strconv.ParseUint(string(data), 10, 64)
+			if err != nil {
+				return fmt.Errorf("arg %v as int: %s", key, err.Error())
+			}
+			x = uint16(x1)
+			fieldValue.Set(reflect.ValueOf(&x).Convert(fieldType))
+		// case "*int64":
+		case schemas.Int64Type.Kind():
+			sdata := string(data)
+			var x int64
+			var err error
+			// for mysql, when use bit, it returned \x01
+			if col.SQLType.Name == schemas.Bit &&
+				strings.Contains(session.engine.DriverName(), "mysql") {
+				if len(data) == 1 {
+					x = int64(data[0])
+				} else {
+					x = 0
+				}
+			} else if strings.HasPrefix(sdata, "0x") {
+				x, err = strconv.ParseInt(sdata, 16, 64)
+			} else if strings.HasPrefix(sdata, "0") {
+				x, err = strconv.ParseInt(sdata, 8, 64)
+			} else {
+				x, err = strconv.ParseInt(sdata, 10, 64)
+			}
+			if err != nil {
+				return fmt.Errorf("arg %v as int: %s", key, err.Error())
+			}
+			fieldValue.Set(reflect.ValueOf(&x).Convert(fieldType))
+		// case "*int":
+		case schemas.IntType.Kind():
+			sdata := string(data)
+			var x int
+			var x1 int64
+			var err error
+			// for mysql, when use bit, it returned \x01
+			if col.SQLType.Name == schemas.Bit &&
+				strings.Contains(session.engine.DriverName(), "mysql") {
+				if len(data) == 1 {
+					x = int(data[0])
+				} else {
+					x = 0
+				}
+			} else if strings.HasPrefix(sdata, "0x") {
+				x1, err = strconv.ParseInt(sdata, 16, 64)
+				x = int(x1)
+			} else if strings.HasPrefix(sdata, "0") {
+				x1, err = strconv.ParseInt(sdata, 8, 64)
+				x = int(x1)
+			} else {
+				x1, err = strconv.ParseInt(sdata, 10, 64)
+				x = int(x1)
+			}
+			if err != nil {
+				return fmt.Errorf("arg %v as int: %s", key, err.Error())
+			}
+			fieldValue.Set(reflect.ValueOf(&x).Convert(fieldType))
+		// case "*int32":
+		case schemas.Int32Type.Kind():
+			sdata := string(data)
+			var x int32
+			var x1 int64
+			var err error
+			// for mysql, when use bit, it returned \x01
+			if col.SQLType.Name == schemas.Bit &&
+				session.engine.dialect.URI().DBType == schemas.MYSQL {
+				if len(data) == 1 {
+					x = int32(data[0])
+				} else {
+					x = 0
+				}
+			} else if strings.HasPrefix(sdata, "0x") {
+				x1, err = strconv.ParseInt(sdata, 16, 64)
+				x = int32(x1)
+			} else if strings.HasPrefix(sdata, "0") {
+				x1, err = strconv.ParseInt(sdata, 8, 64)
+				x = int32(x1)
+			} else {
+				x1, err = strconv.ParseInt(sdata, 10, 64)
+				x = int32(x1)
+			}
+			if err != nil {
+				return fmt.Errorf("arg %v as int: %s", key, err.Error())
+			}
+			fieldValue.Set(reflect.ValueOf(&x).Convert(fieldType))
+		// case "*int8":
+		case schemas.Int8Type.Kind():
+			sdata := string(data)
+			var x int8
+			var x1 int64
+			var err error
+			// for mysql, when use bit, it returned \x01
+			if col.SQLType.Name == schemas.Bit &&
+				strings.Contains(session.engine.DriverName(), "mysql") {
+				if len(data) == 1 {
+					x = int8(data[0])
+				} else {
+					x = 0
+				}
+			} else if strings.HasPrefix(sdata, "0x") {
+				x1, err = strconv.ParseInt(sdata, 16, 64)
+				x = int8(x1)
+			} else if strings.HasPrefix(sdata, "0") {
+				x1, err = strconv.ParseInt(sdata, 8, 64)
+				x = int8(x1)
+			} else {
+				x1, err = strconv.ParseInt(sdata, 10, 64)
+				x = int8(x1)
+			}
+			if err != nil {
+				return fmt.Errorf("arg %v as int: %s", key, err.Error())
+			}
+			fieldValue.Set(reflect.ValueOf(&x).Convert(fieldType))
+		// case "*int16":
+		case schemas.Int16Type.Kind():
+			sdata := string(data)
+			var x int16
+			var x1 int64
+			var err error
+			// for mysql, when use bit, it returned \x01
+			if col.SQLType.Name == schemas.Bit &&
+				strings.Contains(session.engine.DriverName(), "mysql") {
+				if len(data) == 1 {
+					x = int16(data[0])
+				} else {
+					x = 0
+				}
+			} else if strings.HasPrefix(sdata, "0x") {
+				x1, err = strconv.ParseInt(sdata, 16, 64)
+				x = int16(x1)
+			} else if strings.HasPrefix(sdata, "0") {
+				x1, err = strconv.ParseInt(sdata, 8, 64)
+				x = int16(x1)
+			} else {
+				x1, err = strconv.ParseInt(sdata, 10, 64)
+				x = int16(x1)
+			}
+			if err != nil {
+				return fmt.Errorf("arg %v as int: %s", key, err.Error())
+			}
+			fieldValue.Set(reflect.ValueOf(&x).Convert(fieldType))
+		// case "*SomeStruct":
+		case reflect.Struct:
+			switch fieldType {
+			// case "*.time.Time":
+			case schemas.PtrTimeType:
+				x, err := session.byte2Time(col, data)
+				if err != nil {
+					return err
+				}
+				v = x
+				fieldValue.Set(reflect.ValueOf(&x))
+			default:
+				if session.statement.UseCascade {
+					structInter := reflect.New(fieldType.Elem())
+					table, err := session.engine.tagParser.ParseWithCache(structInter.Elem())
+					if err != nil {
+						return err
+					}
+
+					if len(table.PrimaryKeys) > 1 {
+						return errors.New("unsupported composited primary key cascade")
+					}
+
+					var pk = make(schemas.PK, len(table.PrimaryKeys))
+					rawValueType := table.ColumnType(table.PKColumns()[0].FieldName)
+					pk[0], err = str2PK(string(data), rawValueType)
+					if err != nil {
+						return err
+					}
+
+					if !pk.IsZero() {
+						// !nashtsai! TODO for hasOne relationship, it's preferred to use join query for eager fetch
+						// however, also need to consider adding a 'lazy' attribute to xorm tag which allow hasOne
+						// property to be fetched lazily
+						has, err := session.ID(pk).NoCascade().get(structInter.Interface())
+						if err != nil {
+							return err
+						}
+						if has {
+							v = structInter.Interface()
+							fieldValue.Set(reflect.ValueOf(v))
+						} else {
+							return errors.New("cascade obj is not exist")
+						}
+					}
+				} else {
+					return fmt.Errorf("unsupported struct type in Scan: %s", fieldValue.Type().String())
+				}
+			}
+		default:
+			return fmt.Errorf("unsupported type in Scan: %s", fieldValue.Type().String())
 		}
 	default:
 		return fmt.Errorf("unsupported type in Scan: %s", fieldValue.Type().String())
