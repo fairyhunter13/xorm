@@ -15,12 +15,13 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/denisenkom/go-mssqldb v0.0.0-20200620013148-b91950f658ec h1:NfhRXXFDPxcF5Cwo06DzeIaE7uuJtAUhsDwH3LNsjos=
 github.com/denisenkom/go-mssqldb v0.0.0-20200620013148-b91950f658ec/go.mod h1:xbL0rPBG9cCiLr28tMa8zpbdarY27NDyej4t/EjAShU=
-github.com/fairyhunter13/decimal v1.2.0-imp-5 h1:/dyrhMIGUp6qjb2vKjlD0vQGnMHVd2EsOdpTVmAZhOg=
 github.com/fairyhunter13/decimal v1.2.0-imp-5/go.mod h1:pqb4RNxJI5R5ilHfmg9FTkpRMxi95Sa1K6tACdWfv9M=
+github.com/fairyhunter13/decimal v1.2.0-imp-6 h1:6W9X0bC3A9Z8iaW8Wqew18dySWnQ6xbHni62bR/7CV0=
+github.com/fairyhunter13/decimal v1.2.0-imp-6/go.mod h1:pqb4RNxJI5R5ilHfmg9FTkpRMxi95Sa1K6tACdWfv9M=
 github.com/fairyhunter13/newtype v1.0.10 h1:Rq965Tg0UZwHbmbRnP81LMvwasOc1EKp7lHIyjrUoBs=
 github.com/fairyhunter13/newtype v1.0.10/go.mod h1:ta3gbBY75TORM7VVmLaI6nb5i73SDMgAps7QDw9JKFM=
-github.com/fairyhunter13/reflecthelper/v3 v3.5.0 h1:PM28lsmI70qoc2qlo8YpwBwU4i2DU3GxlS5hcvdBFX0=
-github.com/fairyhunter13/reflecthelper/v3 v3.5.0/go.mod h1:lbcpGAaw2Qrb1uYLlR5L5hFHH9wUoyF2LUIASJCaEcw=
+github.com/fairyhunter13/reflecthelper/v3 v3.5.1 h1:M5hyHHguUyTdQkyPcT7C1vYgdNKQHvwSnoZpdL2J0Ro=
+github.com/fairyhunter13/reflecthelper/v3 v3.5.1/go.mod h1:lbcpGAaw2Qrb1uYLlR5L5hFHH9wUoyF2LUIASJCaEcw=
 github.com/fsnotify/fsnotify v1.4.7 h1:IXs+QLmnXW2CcXuY+8Mzv/fWEsPGWxqefPtCP5CnV9I=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/go-sql-driver/mysql v1.5.0 h1:ozyZYNQW3x3HtqT1jira07DN2PArx2v7/mN66gGcHOs=

@@ -8,6 +8,8 @@ import (
 	"database/sql"
 	"errors"
 	"reflect"
+
+	"github.com/fairyhunter13/decimal"
 )
 
 // Count counts the records. bean's non-empty fields
@@ -68,6 +70,11 @@ func (session *Session) SumInt(bean interface{}, columnName string) (res int64, 
 	return res, session.sum(&res, bean, columnName)
 }
 
+// SumDecimal call sum some column. bean's non-empty fields are conditions.
+func (session *Session) SumDecimal(bean interface{}, columnName string) (res decimal.Decimal, err error) {
+	return res, session.sum(&res, bean, columnName)
+}
+
 // Sums call sum some columns. bean's non-empty fields are conditions.
 func (session *Session) Sums(bean interface{}, columnNames ...string) ([]float64, error) {
 	var res = make([]float64, len(columnNames), len(columnNames))
@@ -77,5 +84,11 @@ func (session *Session) Sums(bean interface{}, columnNames ...string) ([]float64
 // SumsInt sum specify columns and return as []int64 instead of []float64
 func (session *Session) SumsInt(bean interface{}, columnNames ...string) ([]int64, error) {
 	var res = make([]int64, len(columnNames), len(columnNames))
+	return res, session.sum(&res, bean, columnNames...)
+}
+
+// SumsDecimal call sum some columns. bean's non-empty fields are conditions.
+func (session *Session) SumsDecimal(bean interface{}, columnNames ...string) ([]decimal.Decimal, error) {
+	var res = make([]decimal.Decimal, len(columnNames), len(columnNames))
 	return res, session.sum(&res, bean, columnNames...)
 }
