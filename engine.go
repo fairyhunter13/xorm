@@ -17,6 +17,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fairyhunter13/decimal"
 	"github.com/fairyhunter13/xorm/caches"
 	"github.com/fairyhunter13/xorm/contexts"
 	"github.com/fairyhunter13/xorm/core"
@@ -1212,6 +1213,13 @@ func (engine *Engine) SumInt(bean interface{}, colName string) (int64, error) {
 	return session.SumInt(bean, colName)
 }
 
+// SumDecimal sums the records by some column. bean's non-empty fields are conditions.
+func (engine *Engine) SumDecimal(bean interface{}, colName string) (decimal.Decimal, error) {
+	session := engine.NewSession()
+	defer session.Close()
+	return session.SumDecimal(bean, colName)
+}
+
 // Sums sum the records by some columns. bean's non-empty fields are conditions.
 func (engine *Engine) Sums(bean interface{}, colNames ...string) ([]float64, error) {
 	session := engine.NewSession()
@@ -1224,6 +1232,13 @@ func (engine *Engine) SumsInt(bean interface{}, colNames ...string) ([]int64, er
 	session := engine.NewSession()
 	defer session.Close()
 	return session.SumsInt(bean, colNames...)
+}
+
+// SumsDecimal sums the records by some columns. bean's non-empty fields are conditions.
+func (engine *Engine) SumsDecimal(bean interface{}, colNames ...string) ([]decimal.Decimal, error) {
+	session := engine.NewSession()
+	defer session.Close()
+	return session.SumsDecimal(bean, colNames...)
 }
 
 // ImportFile SQL DDL file
